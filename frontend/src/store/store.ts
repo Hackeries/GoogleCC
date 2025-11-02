@@ -3,6 +3,9 @@ import { immer } from "zustand/middleware/immer";
 import { devtools, persist } from "zustand/middleware";
 import createSelectors from "./selectors";
 
+// -------------------------
+// 🧠 Types
+// -------------------------
 type UserType = {
   name: string;
   username: string;
@@ -23,6 +26,9 @@ type AuthState = {
   clearExpiresAt: () => void;
 };
 
+// -------------------------
+// 🧩 Auth Slice
+// -------------------------
 const createAuthSlice: StateCreator<AuthState> = (set) => ({
   user: null,
   accessToken: null,
@@ -37,6 +43,9 @@ const createAuthSlice: StateCreator<AuthState> = (set) => ({
   clearExpiresAt: () => set({ expiresAt: null }),
 });
 
+// -------------------------
+// 🏪 Store Initialization
+// -------------------------
 type StoreType = AuthState;
 
 export const useStoreBase = create<StoreType>()(
@@ -53,4 +62,13 @@ export const useStoreBase = create<StoreType>()(
   )
 );
 
+// -------------------------
+// 🧭 Selectors + Compatibility Exports
+// -------------------------
 export const useStore = createSelectors(useStoreBase);
+
+// ✅ Recommended main export for new code
+export const useAuthStore = useStoreBase;
+
+// ✅ Default export for flexibility (optional)
+export default useStoreBase;
