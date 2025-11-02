@@ -1,11 +1,14 @@
 import { NextFunction, Request, Response } from "express";
 
-type AsyncControllerType = (
+export type AsyncControllerType = (
   req: Request,
   res: Response,
   next: NextFunction
 ) => Promise<any>;
 
+/**
+ * Wraps async route handlers to automatically catch and forward errors.
+ */
 export const asyncHandler =
   (controller: AsyncControllerType): AsyncControllerType =>
   async (req, res, next) => {
