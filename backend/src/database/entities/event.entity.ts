@@ -12,10 +12,11 @@ import { User } from "./user.entity";
 import { Meeting } from "./meeting.entity";
 
 export enum EventLocationEnumType {
-  GOOGLE_MEET = "google_meet",
-  ZOOM = "zoom",
-  PHYSICAL = "physical",
-  OTHER = "other",
+  GOOGLE_MEET_AND_CALENDAR = "GOOGLE_MEET_AND_CALENDAR",
+  ZOOM_MEETING = "ZOOM_MEETING",
+  MICROSOFT_TEAMS = "MICROSOFT_TEAMS",
+  PHYSICAL = "PHYSICAL",
+  OTHER = "OTHER",
 }
 
 

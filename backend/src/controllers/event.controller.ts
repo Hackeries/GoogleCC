@@ -33,7 +33,7 @@ export const createEventController = asyncHandlerAndValidation(
     const event = await createEventService(userId, createEventDto);
 
     // Step 2: If location is Google Meet, also create in Google Calendar
-    if (createEventDto.locationType === EventLocationEnumType.GOOGLE_MEET) {
+    if (createEventDto.locationType === EventLocationEnumType.GOOGLE_MEET_AND_CALENDAR) {
       try {
         const { data: integration, error } = await supabase
           .from("integrations")
