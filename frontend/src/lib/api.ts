@@ -1,0 +1,175 @@
+import {
+  AvailabilityType,
+  CreateEventPayloadType,
+  CreateMeetingType,
+  GetAllIntegrationResponseType,
+  LoginResponseType,
+  loginType,
+  PeriodType,
+  PublicAvailabilityEventResponseType,
+  PublicEventResponseType,
+  PublicSingleEventDetailResponseType,
+  registerType,
+  ToggleEventVisibilityResponseType,
+  UserAvailabilityResponseType,
+  UserEventListResponse,
+  UserMeetingsResponseType,
+} from "@/types/api.type";
+import { API, PublicAPI } from "./axios-client";
+import { IntegrationAppType, VideoConferencingPlatform } from "./types";
+
+// =========================
+// 🔐 AUTHENTICATION APIS
+// =========================
+export const loginMutationFn = async (
+  data: loginType
+): Promise<LoginResponseType> => {
+  const response = await API.post("/auth/login", data);
+  return response.data;
+};
+
+export const registerMutationFn = async (
+  data: registerType
+): Promise<LoginResponseType> => {
+  const response = await API.post("/auth/register", data);
+  return response.data;
+};
+
+// =========================
+// 📅 EVENT APIS
+// =========================
+export const createEventMutationFn = async (
+  data: CreateEventPayloadType
+): Promise<{ message: string }> => {
+  const response = await API.post("/events/create", data);
+  return response.data;
+};
+
+// ✅ alias to match incorrect import (fix for “CreateEventMutationFn” error)
+export const CreateEventMutationFn = createEventMutationFn;
+
+export const toggleEventVisibilityMutationFn = async (data: {
+  eventId: string;
+}): Promise<ToggleEventVisibilityResponseType> => {
+  const response = await API.put(`/events/${data.eventId}/toggle-privacy`, {});
+  return response.data;
+};
+
+export const getEventListQueryFn = async (): Promise<UserEventListResponse> => {
+  const response = await API.get("/events/all");
+  return response.data;
+};
+
+// =========================
+// 🔗 INTEGRATION APIS
+// =========================
+export const checkIntegrationQueryFn = async (
+  appType: VideoConferencingPlatform
+): Promise<{ connected: boolean }> => {
+  const response = await API.get(`/integration/check/${appType}`);
+  return response.data;
+};
+
+export const getAllIntegrationQueryFn =
+  async (): Promise<GetAllIntegrationResponseType> => {
+    const response = await API.get("/integration/all");
+    return response.data;
+  };
+
+export const connectAppIntegrationQueryFn = async (
+  appType: IntegrationAppType
+): Promise<{ redirectUrl: string }> => {
+  const response = await API.get(`/integration/connect/${appType}`);
+  return response.data;
+};
+
+// =========================
+// 🕒 AVAILABILITY APIS
+// =========================
+export const getUserAvailabilityQueryFn =
+  async (): Promise<UserAvailabilityResponseType> => {
+    const response = await API.get("/availability/me");
+    return response.data;
+  };
+
+export const updateUserAvailabilityMutationFn = async (
+  data: AvailabilityType
+): Promise<{ message: string }> => {
+  const response = await API.put("/availability/update", data);
+  return response.data;
+};
+
+// =========================
+// 📞 MEETING APIS
+// =========================
+export const getUserMeetingsQueryFn = async (
+  filter: PeriodType
+): Promise<UserMeetingsResponseType> => {
+  const response = await API.get(
+    `/meeting/user/all${filter ? `?filter=${filter}` : ""}`
+  );
+  return response.data;
+};
+
+export const cancelMeetingMutationFn = async (
+  meetingId: string
+): Promise<{ message: string }> => {
+  const response = await API.put(`/meeting/cancel/${meetingId}`, {});
+  return response.data;
+};
+
+// =========================
+// 🌐 PUBLIC / EXTERNAL APIS
+// =========================
+export const getAllPublicEventQueryFn = async (
+  username: string
+): Promise<PublicEventResponseType> => {
+  const response = await PublicAPI.get(`/events/public/${username}`);
+  return response.data;
+};
+
+export const getSinglePublicEventBySlugQueryFn = async (data: {
+  username: string;
+  slug: string;
+}): Promise<PublicSingleEventDetailResponseType> => {
+  const response = await PublicAPI.get(
+    `/events/public/${data.username}/${data.slug}`
+  );
+  return response.data;
+};
+
+export const getPublicAvailabilityByEventIdQueryFn = async (
+  eventId: string,
+  timezone?: string
+): Promise<PublicAvailabilityEventResponseType> => {
+  const url = `/availability/public/${eventId}${
+    timezone ? `?timezone=${timezone}` : ""
+  }`;
+  const response = await PublicAPI.get(url);
+  return response.data;
+};
+
+// =========================
+// 🗓️ SCHEDULE MEETING (PUBLIC)
+// =========================
+export interface ScheduleMeetingResponse {
+  data?: {
+    meetLink?: string;
+  };
+  meetLink?: string;
+}
+
+export const scheduleMeetingMutationFn = async (
+  data: CreateMeetingType
+): Promise<ScheduleMeetingResponse> => {
+  const response = await API.post("/meeting/public/create", data);
+  const result = response.data;
+
+  // ✅ Normalize response to expected shape
+  return {
+    data: {
+      meetLink: result?.meetLink || result?.meetingLink || result?.link || "",
+    },
+    meetLink: result?.meetLink || result?.meetingLink || result?.link || "",
+  };
+};
