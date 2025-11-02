@@ -38,3 +38,19 @@ export class MeetingIdDTO {
   @IsNotEmpty()
   meetingId: string;
 }
+
+export class RescheduleMeetingDto {
+  @IsDateString()
+  @IsNotEmpty()
+  startTime: string;
+
+  @IsDateString()
+  @IsNotEmpty()
+  endTime: string;
+}
+
+export class RescheduleMeetingParamsDto {
+  @IsUUID(4, { message: "Invalid uuid" })
+  @IsNotEmpty()
+  meetingId: string;
+}

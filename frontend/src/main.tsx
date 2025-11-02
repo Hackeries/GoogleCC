@@ -6,6 +6,7 @@ import { Toaster } from "sonner";
 import QueryProvider from "./context/query-provider.tsx";
 import App from "./App.tsx";
 import "./index.css";
+import "./styles/google-calendar-theme.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

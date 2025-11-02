@@ -9,9 +9,15 @@ import {
   cancelMeetingService,
   createMeetBookingForGuestService,
   getUserMeetingsService,
+  rescheduleMeetingService,
 } from "../services/meeting.service";
 import { asyncHandlerAndValidation } from "../middlewares/withValidation.middleware";
-import { CreateMeetingDto, MeetingIdDTO } from "../database/dto/meeting.dto";
+import { 
+  CreateMeetingDto, 
+  MeetingIdDTO, 
+  RescheduleMeetingDto,
+  RescheduleMeetingParamsDto 
+} from "../database/dto/meeting.dto";
 
 export const getUserMeetingsController = asyncHandler(
   async (req: Request, res: Response) => {
@@ -54,6 +60,20 @@ export const cancelMeetingController = asyncHandlerAndValidation(
     await cancelMeetingService(meetingIdDto.meetingId);
     return res.status(HTTPSTATUS.OK).json({
       messsage: "Meeting cancelled successfully",
+    });
+  }
+);
+
+export const rescheduleMeetingController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { meetingId } = req.params;
+    const { startTime, endTime } = req.body;
+
+    const meeting = await rescheduleMeetingService(meetingId, startTime, endTime);
+
+    return res.status(HTTPSTATUS.OK).json({
+      message: "Meeting rescheduled successfully",
+      meeting,
     });
   }
 );
