@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { Calendar, dateFnsLocalizer, View } from "react-big-calendar";
+import { Calendar, dateFnsLocalizer } from "react-big-calendar";
 import { format, parse, startOfWeek, getDay } from "date-fns";
 import { enUS } from "date-fns/locale";
 import "react-big-calendar/lib/css/react-big-calendar.css";
@@ -39,7 +39,7 @@ const localizer = dateFnsLocalizer({
 });
 
 interface CalendarEvent {
-  id?: string;
+  id: string;
   title: string;
   start: Date;
   end: Date;
@@ -110,16 +110,18 @@ const EnhancedCalendar = () => {
   // Convert meetings to calendar events
   useEffect(() => {
     if (meetingsData?.meetings) {
-      const calendarEvents: CalendarEvent[] = meetingsData.meetings.map(
-        (meeting) => ({
-          id: meeting.id,
-          title: meeting.event?.title || meeting.guestName,
-          start: new Date(meeting.startTime),
-          end: new Date(meeting.endTime),
-          description: meeting.additionalInfo,
-          color: "#1a73e8",
-        })
-      );
+      const calendarEvents: CalendarEvent[] = meetingsData.meetings
+        .filter((meeting) => meeting.id) // Only include meetings with IDs
+        .map(
+          (meeting) => ({
+            id: meeting.id,
+            title: meeting.event?.title || meeting.guestName,
+            start: new Date(meeting.startTime),
+            end: new Date(meeting.endTime),
+            description: meeting.additionalInfo,
+            color: "#1a73e8",
+          })
+        );
       setEvents(calendarEvents);
     }
   }, [meetingsData]);
@@ -361,7 +363,7 @@ const EnhancedCalendar = () => {
                   startAccessor="start"
                   endAccessor="end"
                   style={{ height: "100%" }}
-                  view={currentView as View}
+                  view={(currentView === "year" || currentView === "schedule" ? "month" : currentView) as "month" | "week" | "day"}
                   onView={() => {}} // Controlled by our custom view selector
                   date={currentDate}
                   onNavigate={setCurrentDate}
