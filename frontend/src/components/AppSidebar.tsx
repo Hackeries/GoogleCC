@@ -67,13 +67,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     },
     {
       title: "Availability",
-      url: PROTECTED_ROUTES.AVAILBILITIY,
+      url: PROTECTED_ROUTES.AVAILABILITY,
       icon: ClockIcon,
       section: "Events",
     },
     {
       title: "My Calendar",
-      url: PROTECTED_ROUTES.CALENDER,
+      url: PROTECTED_ROUTES.CALENDAR,
       icon: CalendarCheck,
       section: "Events",
       separator: true,

@@ -1,203 +1,85 @@
-import { z } from "zod";
-import { toast } from "sonner";
-import { useCallback, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { useMutation } from "@tanstack/react-query";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { dayMapping } from "@/lib/availability";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
-import { Label } from "@/components/ui/label";
-import DayAvailability from "./day-availability";
+import React from "react";
 import { DayAvailabilityType } from "@/types/api.type";
-import { updateUserAvailabilityMutationFn } from "@/lib/api";
-import { Loader } from "@/components/loader";
+import { dayMapping } from "@/lib/availability";
 
-const WeeklyHoursRow = ({
-  days,
-  timeGap,
-}: {
+type WeekPreviewGridProps = {
   days: DayAvailabilityType[];
-  timeGap: number;
+  timezone?: string;
+};
+
+const WeekPreviewGrid: React.FC<WeekPreviewGridProps> = ({
+  days,
+  timezone = "UTC",
 }) => {
-  const { mutate, isPending } = useMutation({
-    mutationFn: updateUserAvailabilityMutationFn,
-  });
+  const hours = Array.from({ length: 24 }, (_, i) => i);
 
-  const timeGapSchema = z
-    .number()
-    .int({ message: "Time gap must be an integer" })
-    .min(1, { message: "Time gap must be at least 1 minute" })
-    .refine((value) => [15, 30, 45, 60, 120].includes(value), {
-      message: "Time gap must be 15, 30, 45, 60, or 120 minutes",
-    });
-
-  const availabilitySchema = z
-    .object({
-      timeGap: timeGapSchema,
-      days: z.array(
-        z.object({
-          day: z.string(),
-          startTime: z.string(),
-          endTime: z.string(),
-          isAvailable: z.boolean(),
-        })
-      ),
-    })
-    .superRefine((data, ctx) => {
-      data.days.forEach((item, index) => {
-        if (item.isAvailable && item.startTime && item.endTime) {
-          if (item.endTime <= item.startTime) {
-            // Add error to both startTime and endTime fields
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: "End time must be greater than start time",
-              path: ["availability", index, "startTime"],
-            });
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: "End time must be greater than start time",
-              path: ["availability", index, "endTime"],
-            });
-          }
-        }
-      });
-    });
-
-  type WeeklyHoursFormData = z.infer<typeof availabilitySchema>;
-
-  const form = useForm<WeeklyHoursFormData>({
-    resolver: zodResolver(availabilitySchema),
-    mode: "onChange",
-    defaultValues: {
-      timeGap: 30,
-      days: [],
-    },
-  });
-
-  useEffect(() => {
-    form.setValue("days", days);
-    form.setValue("timeGap", timeGap);
-    form.trigger("days");
-  }, [days, form, timeGap]);
-
-  const onSubmit = (values: WeeklyHoursFormData) => {
-    console.log("Form Data:", values);
-    if (isPending) return;
-
-    mutate(values, {
-      onSuccess: (response) => {
-        toast.success(response.message || "Availability updated successfully");
-      },
-      onError: (error) => {
-        console.log(error);
-        toast.error(error.message || "Failed to update availability");
-      },
+  const formatHour = (h: number, tz: string) => {
+    const dt = new Date();
+    dt.setHours(h, 0, 0, 0);
+    return dt.toLocaleTimeString("en-US", {
+      hour: "numeric",
+      hour12: true,
+      timeZone: tz,
     });
   };
 
-  const handleTimeSelect = useCallback(
-    (day: string, field: "startTime" | "endTime", time: string) => {
-      const index = form
-        .getValues("days")
-        .findIndex((item) => item.day === day);
-      if (index !== -1) {
-        form.setValue(`days.${index}.${field}`, time, {
-          shouldValidate: true,
-        });
-        form.trigger(`days.${index}.startTime`);
-        form.trigger(`days.${index}.endTime`);
-      }
-    },
-    [form]
-  );
-
-  const onRemove = useCallback(
-    (day: string) => {
-      const index = form
-        .getValues("days")
-        .findIndex((item) => item.day === day);
-      if (index !== -1) {
-        form.setValue(`days.${index}.isAvailable`, false);
-        form.setValue(`days.${index}.startTime`, "09:00");
-        form.setValue(`days.${index}.endTime`, "17:00");
-      }
-    },
-    [form]
-  );
+  const normalizeTimeToIndex = (time: string): number => {
+    const [hh, mm] = time.split(":").map(Number);
+    return hh + mm / 60;
+  };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3 pt-0">
-        {/* Time Gap Input */}
-        <FormField
-          name="timeGap"
-          control={form.control}
-          render={({ field }) => (
-            <FormItem className="flex items-center gap-4 p-5 pb-1">
-              <Label className="text-[15px] font-medium shrink-0">
-                Time Gap (mins):
-              </Label>
-              <div className="relative w-full">
-                <FormControl>
-                  <Input
-                    {...field}
-                    type="number"
-                    className="w-[100px] !py-[10px] min-h-[46px]
-                     px-[14px] !h-auto"
-                    value={field.value || ""}
-                    min="1"
-                    onChange={(e) => {
-                      const value = e.target.value.trim();
-                      if (value === "") {
-                        field.onChange(null);
-                      } else {
-                        const parsedValue = parseInt(value, 10);
-                        if (!isNaN(parsedValue) && parsedValue > 0) {
-                          field.onChange(parsedValue);
-                        }
-                      }
+    <div className="p-6 border rounded-lg bg-white shadow-sm">
+      <h4 className="text-md font-semibold mb-3 text-gray-800">
+        Weekly Availability ({timezone})
+      </h4>
+
+      <div className="space-y-3">
+        {days.map((d) => {
+          const start = normalizeTimeToIndex(d.startTime);
+          const end = normalizeTimeToIndex(d.endTime);
+          const startPercent = (start / 24) * 100;
+          const widthPercent = ((end - start) / 24) * 100;
+
+          return (
+            <div key={d.day} className="flex items-center gap-3">
+              <div className="w-24 text-sm font-medium text-gray-700">
+                {dayMapping[d.day as keyof typeof dayMapping]}
+              </div>
+
+              <div className="relative flex-1 h-5 bg-gray-100 rounded-md overflow-hidden">
+                {d.isAvailable && (
+                  <div
+                    className="absolute top-0 bottom-0 bg-blue-500/60 rounded-md transition-all duration-300"
+                    style={{
+                      transform: `translateX(${startPercent}%)`,
+                      width: `${widthPercent}%`,
                     }}
                   />
-                </FormControl>
-                <FormMessage className="absolute top-full left-0 mt-2" />
+                )}
               </div>
-            </FormItem>
-          )}
-        />
 
-        <div className="space-y-1">
-          {form.watch("days").map((day, index) => (
-            <DayAvailability
-              key={day.day}
-              day={day.day}
-              startTime={day.startTime}
-              endTime={day.endTime}
-              isAvailable={day.isAvailable}
-              index={index}
-              form={form}
-              dayMapping={dayMapping}
-              onRemove={onRemove}
-              onTimeSelect={handleTimeSelect}
-            />
+              <div className="w-36 text-xs text-gray-600 text-right">
+                {d.isAvailable
+                  ? `${d.startTime} - ${d.endTime}`
+                  : "Unavailable"}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="mt-4 border-t pt-3 grid grid-cols-6 text-[10px] text-gray-500">
+        {hours
+          .filter((h) => h % 4 === 0)
+          .map((h) => (
+            <span key={h} className="text-center">
+              {formatHour(h, timezone)}
+            </span>
           ))}
-        </div>
-
-        <div className="w-full pt-4">
-          <Button disabled={isPending} type="submit" className=" !px-10">
-            {isPending ? <Loader color="white" /> : "Save changes"}
-          </Button>
-        </div>
-      </form>
-    </Form>
+      </div>
+    </div>
   );
 };
 
-export default WeeklyHoursRow;
+export default WeekPreviewGrid;

@@ -23,14 +23,13 @@
     "noUncheckedSideEffectImports": true,
     "forceConsistentCasingInFileNames": true,
 
-    /* Paths (still supported until TS7) */
-    "baseUrl": ".",
+    /* Updated Paths (new format) */
     "paths": {
       "@/*": ["./src/*"]
     },
 
-    /* TypeScript 7+ safety flag */
-    "ignoreDeprecations": "6.0"
+    /* Silence deprecated warning */
+    "ignoreDeprecations": "5.0"
   },
   "include": ["src"]
 }

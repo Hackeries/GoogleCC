@@ -61,10 +61,11 @@ const IntegrationCard = ({
     setSelectedType(appType);
     setIsLoading(true);
     try {
-      const { url } = await connectAppIntegrationQueryFn(appType);
-      console.log(SUCCESS_MESSAGES[appType], url);
+      // ✅ Fixed: use redirectUrl instead of url
+      const { redirectUrl } = await connectAppIntegrationQueryFn(appType);
+      console.log(SUCCESS_MESSAGES[appType], redirectUrl);
       setSelectedType(null);
-      window.location.href = url;
+      window.location.href = redirectUrl;
     } catch (error) {
       setIsLoading(false);
       console.error("Failed to connect Google Calendar:", error);
@@ -138,8 +139,7 @@ export const ImageWrapper: React.FC<ImageWrapperProps> = ({
 }) => {
   return (
     <div
-      className={`flex items-center justify-center rounded-full size-[50px] ${className}`}
-      style={{ boxShadow: "0 2px 5px 0 rgb(0 0 0 / 27%)" }}
+      className={`flex items-center justify-center rounded-full size-[50px] shadow-md ${className}`}
     >
       <img
         src={src}

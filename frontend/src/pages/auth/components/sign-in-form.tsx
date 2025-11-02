@@ -1,3 +1,4 @@
+// pages/auth/components/sign-in-form.tsx
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -21,7 +22,6 @@ import { loginMutationFn } from "@/lib/api";
 import { toast } from "sonner";
 import { Loader } from "@/components/loader";
 import { motion } from "framer-motion";
-
 import { useState } from "react";
 
 const signInSchema = z.object({
@@ -60,7 +60,7 @@ export function SignInForm({
         setAccessToken(data.accessToken);
         setExpiresAt(data.expiresAt);
         toast.success("Logged in successfully 🚀");
-        navigate(PROTECTED_ROUTES.EVENT_TYPES);
+        navigate(PROTECTED_ROUTES.CALENDAR);
       },
       onError: (error) => {
         toast.error(error.message || "Failed to login");
@@ -70,30 +70,31 @@ export function SignInForm({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
       className={cn("flex flex-col gap-6 w-full", className)}
       {...props}
     >
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-6 max-w-md mx-auto"
+        >
           {/* Header */}
-          <div className="flex flex-col items-center gap-2">
-            <Link
-              to="/"
-              className="flex flex-col items-center gap-2 font-medium"
+          <div className="flex flex-col items-center gap-3">
+            <motion.div
+              whileHover={{ rotate: 10 }}
+              className="flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-500 text-white shadow-lg"
             >
-              <motion.div
-                whileHover={{ rotate: 10 }}
-                className="flex aspect-square size-10 items-center justify-center rounded-lg bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-md"
-              >
-                <Command className="size-5" />
-              </motion.div>
-            </Link>
-            <h2 className="text-xl font-bold text-[#0a2540]">
-              Log into your GCC account
+              <Command className="size-6" />
+            </motion.div>
+            <h2 className="text-2xl font-semibold text-[#0a2540]">
+              Welcome back to Google Cal 1.1
             </h2>
+            <p className="text-sm text-gray-500">
+              Log in to access your calendar and meetings.
+            </p>
           </div>
 
           {/* Form Card */}
@@ -101,7 +102,7 @@ export function SignInForm({
             initial={{ scale: 0.98, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.1 }}
-            className="w-full bg-white/70 backdrop-blur-md flex flex-col gap-5 rounded-[10px] p-6 shadow-lg border border-slate-200"
+            className="w-full bg-white/80 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-gray-100 flex flex-col gap-6"
           >
             <div className="flex flex-col gap-4">
               {/* Email Field */}
@@ -110,14 +111,13 @@ export function SignInForm({
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <Label className="font-semibold !text-sm">Email</Label>
+                    <Label className="font-medium text-sm">Email address</Label>
                     <FormControl>
                       <Input
                         {...field}
                         type="email"
                         placeholder="you@example.com"
-                        autoFocus
-                        className="transition-all focus:ring-2 focus:ring-primary"
+                        className="transition-all focus:ring-2 focus:ring-blue-500"
                       />
                     </FormControl>
                     <FormMessage />
@@ -131,14 +131,14 @@ export function SignInForm({
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <Label className="font-semibold !text-sm">Password</Label>
+                    <Label className="font-medium text-sm">Password</Label>
                     <div className="relative">
                       <FormControl>
                         <Input
                           {...field}
                           type={showPassword ? "text" : "password"}
                           placeholder="••••••••"
-                          className="pr-10 transition-all focus:ring-2 focus:ring-primary"
+                          className="pr-10 transition-all focus:ring-2 focus:ring-blue-500"
                         />
                       </FormControl>
                       <Button
@@ -147,6 +147,9 @@ export function SignInForm({
                         size="icon"
                         onClick={() => setShowPassword(!showPassword)}
                         className="absolute right-1 top-1/2 -translate-y-1/2"
+                        aria-label={
+                          showPassword ? "Hide password" : "Show password"
+                        }
                       >
                         {showPassword ? (
                           <EyeOff size={16} />
@@ -155,55 +158,64 @@ export function SignInForm({
                         )}
                       </Button>
                     </div>
+                    <div className="text-right text-xs mt-1">
+                      <Link
+                        to="#"
+                        className="text-blue-600 hover:underline hover:text-blue-700"
+                      >
+                        Forgot password?
+                      </Link>
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
-              {/* Submit Button */}
-              <motion.div whileTap={{ scale: 0.98 }}>
-                <Button disabled={isPending} type="submit" className="w-full">
-                  {isPending ? (
-                    <Loader color="white" />
-                  ) : (
-                    <>
-                      <LogIn className="mr-2 h-4 w-4" /> Login
-                    </>
-                  )}
-                </Button>
-              </motion.div>
             </div>
 
-            {/* OR Divider */}
+            {/* Submit Button */}
+            <motion.div whileTap={{ scale: 0.98 }}>
+              <Button
+                disabled={isPending}
+                type="submit"
+                className="w-full font-semibold tracking-wide"
+              >
+                {isPending ? (
+                  <Loader color="white" />
+                ) : (
+                  <>
+                    <LogIn className="mr-2 h-4 w-4" /> Sign in
+                  </>
+                )}
+              </Button>
+            </motion.div>
+
+            {/* Divider */}
             <div className="relative text-center text-sm text-muted-foreground">
               <span className="bg-white px-2 relative z-10">Or</span>
               <div className="absolute left-0 top-1/2 w-full border-t border-gray-200 z-0" />
             </div>
 
-            {/* Google Button */}
+            {/* Google Sign In */}
             <motion.div whileHover={{ scale: 1.02 }}>
               <Button
                 variant="outline"
                 className="w-full flex gap-2 items-center justify-center hover:bg-gray-100"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
+                <img
+                  src="https://www.svgrepo.com/show/475656/google-color.svg"
+                  alt="Google"
                   className="w-5 h-5"
-                  fill="currentColor"
-                >
-                  <path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z" />
-                </svg>
+                />
                 Continue with Google
               </Button>
             </motion.div>
 
             {/* Footer */}
-            <div className="text-center text-sm">
+            <div className="text-center text-sm text-gray-600">
               Don’t have an account?{" "}
               <Link
                 to={AUTH_ROUTES.SIGN_UP}
-                className="underline underline-offset-4 text-primary font-medium"
+                className="text-blue-600 font-medium hover:underline"
               >
                 Sign up
               </Link>
