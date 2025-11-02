@@ -117,7 +117,7 @@ const EnhancedCalendar = () => {
           start: new Date(meeting.startTime),
           end: new Date(meeting.endTime),
           description: meeting.additionalInfo,
-          color: meeting.event?.color || "#1a73e8",
+          color: "#1a73e8",
         })
       );
       setEvents(calendarEvents);
@@ -281,7 +281,7 @@ const EnhancedCalendar = () => {
                 className="h-full"
               >
                 <YearView
-                  events={events}
+                  events={events as any}
                   currentDate={currentDate}
                   onDateClick={(date) => {
                     setCurrentDate(date);
@@ -361,7 +361,7 @@ const EnhancedCalendar = () => {
                   startAccessor="start"
                   endAccessor="end"
                   style={{ height: "100%" }}
-                  view={currentView as BigCalendarView}
+                  view={currentView as any}
                   onView={() => {}} // Controlled by our custom view selector
                   date={currentDate}
                   onNavigate={setCurrentDate}
