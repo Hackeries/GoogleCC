@@ -363,7 +363,7 @@ const EnhancedCalendar = () => {
                   startAccessor="start"
                   endAccessor="end"
                   style={{ height: "100%" }}
-                  view={(currentView === "year" || currentView === "schedule" ? "month" : currentView) as "month" | "week" | "day"}
+                  view={currentView}
                   onView={() => {}} // Controlled by our custom view selector
                   date={currentDate}
                   onNavigate={setCurrentDate}
