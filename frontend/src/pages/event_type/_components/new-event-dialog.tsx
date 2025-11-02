@@ -22,12 +22,12 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { PlusIcon } from "lucide-react";
 import { locationOptions, VideoConferencingPlatform } from "@/lib/types";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { PROTECTED_ROUTES } from "@/routes/common/routePaths";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { checkIntegrationQueryFn, CreateEventMutationFn } from "@/lib/api";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
+import { checkIntegrationQueryFn, CreateEventMutationFn, getAllIntegrationQueryFn } from "@/lib/api";
 import { toast } from "sonner";
 import { Loader } from "@/components/loader";
 
@@ -43,6 +43,12 @@ const NewEventDialog = ({ btnVariant }: { btnVariant?: string }) => {
   const [isChecking, setIsChecking] = useState(false);
   const [appConnected, setAppConnected] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  // ✅ Fetch all integrations to check connection status
+  const { data: integrationsData } = useQuery({
+    queryKey: ["integrations"],
+    queryFn: getAllIntegrationQueryFn,
+  });
 
   // ✅ Schema
   const eventSchema = z.object({
@@ -71,14 +77,39 @@ const NewEventDialog = ({ btnVariant }: { btnVariant?: string }) => {
 
   const { isValid } = form.formState;
 
+  // ✅ Check if Google Meet is connected when integrations data loads
+  useEffect(() => {
+    if (integrationsData?.data?.integrations) {
+      const googleMeetIntegration = integrationsData.data.integrations.find(
+        (integration) => integration.appType === "GOOGLE_MEET_AND_CALENDAR"
+      );
+      if (googleMeetIntegration?.isConnected && selectedLocationType === VideoConferencingPlatform.GOOGLE_MEET_AND_CALENDAR) {
+        setAppConnected(true);
+        setError(null);
+      }
+    }
+  }, [integrationsData, selectedLocationType]);
+
   const handleLocationTypeChange = async (value: VideoConferencingPlatform) => {
     setSelectedLocationType(value);
-    setAppConnected(false);
+    setError(null);
 
     if (value === VideoConferencingPlatform.GOOGLE_MEET_AND_CALENDAR) {
+      // ✅ Check if already connected from the fetched integrations data
+      const googleMeetIntegration = integrationsData?.data?.integrations.find(
+        (integration) => integration.appType === "GOOGLE_MEET_AND_CALENDAR"
+      );
+
+      if (googleMeetIntegration?.isConnected) {
+        setAppConnected(true);
+        form.setValue("locationType", value);
+        form.trigger("locationType");
+        return;
+      }
+
+      // ✅ If not found in cache, check via API
       setIsChecking(true);
       try {
-        // ✅ Corrected destructuring
         const { connected } = await checkIntegrationQueryFn(
           VideoConferencingPlatform.GOOGLE_MEET_AND_CALENDAR
         );
@@ -87,6 +118,7 @@ const NewEventDialog = ({ btnVariant }: { btnVariant?: string }) => {
           setError(
             `Google Meet is not connected. <a href=${PROTECTED_ROUTES.INTEGRATIONS} target="_blank" class='underline text-primary'>Visit the integration page</a> to connect your account.`
           );
+          setAppConnected(false);
           return;
         }
 
@@ -97,11 +129,12 @@ const NewEventDialog = ({ btnVariant }: { btnVariant?: string }) => {
       } catch (error) {
         console.error("Integration check failed:", error);
         setError("Failed to check Google Meet integration status.");
+        setAppConnected(false);
       } finally {
         setIsChecking(false);
       }
     } else {
-      setError(null);
+      setAppConnected(false);
       form.setValue("locationType", value);
     }
   };
@@ -119,9 +152,11 @@ const NewEventDialog = ({ btnVariant }: { btnVariant?: string }) => {
     mutate(payload, {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["event_list"] });
+        queryClient.invalidateQueries({ queryKey: ["integrations"] });
         setSelectedLocationType(null);
         setIsOpen(false);
         setAppConnected(false);
+        setError(null);
         form.reset();
         toast.success("Event created successfully!");
       },

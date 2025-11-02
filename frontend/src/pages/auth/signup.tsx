@@ -22,7 +22,7 @@ const Signup = () => {
           </motion.div>
 
           <h1 className="text-2xl font-bold text-[#0a2540] text-center">
-            Create your GCC account
+            Create your Google Cal 1.1 account
           </h1>
           <p className="text-sm text-gray-500 text-center">
             Start managing your calendar efficiently.

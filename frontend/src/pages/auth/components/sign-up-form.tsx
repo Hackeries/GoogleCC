@@ -77,22 +77,6 @@ export function SignUpForm({
           onSubmit={form.handleSubmit(onSubmit)}
           className="space-y-6 max-w-md mx-auto"
         >
-          {/* Header */}
-          <div className="flex flex-col items-center gap-3">
-            <motion.div
-              whileHover={{ rotate: 10 }}
-              className="flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-500 text-white shadow-lg"
-            >
-              <Command className="size-6" />
-            </motion.div>
-            <h2 className="text-2xl font-semibold text-[#0a2540]">
-              Create your Google Cal 1.1 account
-            </h2>
-            <p className="text-sm text-gray-500">
-              Start organizing your meetings efficiently.
-            </p>
-          </div>
-
           {/* Form Card */}
           <motion.div
             initial={{ scale: 0.98, opacity: 0 }}

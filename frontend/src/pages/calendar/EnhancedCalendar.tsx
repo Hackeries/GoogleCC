@@ -238,7 +238,7 @@ const EnhancedCalendar = () => {
 
   if (isLoading) {
     return (
-      <div className="flex h-screen">
+      <div className="flex h-[calc(100vh-80px)]">
         <GoogleCalendarSidebar />
         <div className="flex-1 flex items-center justify-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1a73e8]"></div>
@@ -248,7 +248,7 @@ const EnhancedCalendar = () => {
   }
 
   return (
-    <div className="flex h-screen bg-white dark:bg-gray-900">
+    <div className="flex h-[calc(100vh-80px)] bg-white dark:bg-gray-900">
       {/* Sidebar */}
       <GoogleCalendarSidebar
         onCreateEvent={(type) => {
@@ -269,7 +269,7 @@ const EnhancedCalendar = () => {
         />
 
         {/* Calendar Content */}
-        <div className="flex-1 overflow-auto p-6">
+        <div className="flex-1 overflow-auto p-4">
           <AnimatePresence mode="wait">
             {currentView === "year" ? (
               <motion.div
