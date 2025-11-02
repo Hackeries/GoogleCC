@@ -15,6 +15,8 @@ import {
   UserAvailabilityResponseType,
   UserEventListResponse,
   UserMeetingsResponseType,
+  IntegrationType,
+  EventType, // ✅ added to fix missing reference
 } from "@/types/api.type";
 import { API, PublicAPI } from "./axios-client";
 import { IntegrationAppType, VideoConferencingPlatform } from "./types";
@@ -46,7 +48,7 @@ export const createEventMutationFn = async (
   return response.data;
 };
 
-// ✅ alias to match incorrect import (fix for “CreateEventMutationFn” error)
+// ✅ alias for compatibility
 export const CreateEventMutationFn = createEventMutationFn;
 
 export const toggleEventVisibilityMutationFn = async (data: {
@@ -61,7 +63,9 @@ export const getEventListQueryFn = async (): Promise<UserEventListResponse> => {
   return response.data;
 };
 
-export const deleteEventMutationFn = async (eventId: string): Promise<{ message: string }> => {
+export const deleteEventMutationFn = async (
+  eventId: string
+): Promise<{ message: string }> => {
   const response = await API.delete(`/events/${eventId}`);
   return response.data;
 };
@@ -87,15 +91,32 @@ export const updateEventMutationFn = async (data: {
 // =========================
 export const checkIntegrationQueryFn = async (
   appType: VideoConferencingPlatform
-): Promise<{ connected: boolean }> => {
+): Promise<{ isConnected: boolean }> => {
   const response = await API.get(`/integration/check/${appType}`);
-  return response.data;
+  const data = response.data as { isConnected?: boolean; connected?: boolean };
+
+  return {
+    isConnected: data.isConnected ?? data.connected ?? false,
+  };
 };
 
+// ✅ Type-safe normalization instead of `any`
 export const getAllIntegrationQueryFn =
   async (): Promise<GetAllIntegrationResponseType> => {
     const response = await API.get("/integration/all");
-    return response.data;
+    const data = response.data as GetAllIntegrationResponseType;
+
+    const normalizedIntegrations: IntegrationType[] = (
+      data.integrations || []
+    ).map((integration: IntegrationType & { connected?: boolean }) => ({
+      ...integration,
+      isConnected: integration.isConnected ?? integration.connected ?? false,
+    }));
+
+    return {
+      ...data,
+      integrations: normalizedIntegrations,
+    };
   };
 
 export const connectAppIntegrationQueryFn = async (
@@ -169,7 +190,7 @@ export interface DashboardAnalyticsResponse {
       email: string;
       meetingCount: number;
     }>;
-    meetingsPerDay: { [key: string]: number };
+    meetingsPerDay: Record<string, number>;
     recentMeetings: Array<{
       id: string;
       title: string;
@@ -187,10 +208,11 @@ export interface DashboardAnalyticsResponse {
   };
 }
 
-export const getDashboardAnalyticsQueryFn = async (): Promise<DashboardAnalyticsResponse> => {
-  const response = await API.get("/analytics/dashboard");
-  return response.data;
-};
+export const getDashboardAnalyticsQueryFn =
+  async (): Promise<DashboardAnalyticsResponse> => {
+    const response = await API.get("/analytics/dashboard");
+    return response.data;
+  };
 
 // =========================
 // 🌐 PUBLIC / EXTERNAL APIS
@@ -237,13 +259,17 @@ export const scheduleMeetingMutationFn = async (
   data: CreateMeetingType
 ): Promise<ScheduleMeetingResponse> => {
   const response = await API.post("/meeting/public/create", data);
-  const result = response.data;
+  const result = response.data as Record<string, unknown>;
 
-  // ✅ Normalize response to expected shape
+  // ✅ Normalize response
+  const meetLink =
+    (result.meetLink as string) ||
+    (result.meetingLink as string) ||
+    (result.link as string) ||
+    "";
+
   return {
-    data: {
-      meetLink: result?.meetLink || result?.meetingLink || result?.link || "",
-    },
-    meetLink: result?.meetLink || result?.meetingLink || result?.link || "",
+    data: { meetLink },
+    meetLink,
   };
 };
