@@ -147,7 +147,7 @@ const Dashboard = () => {
           <CardContent>
             {topAttendees.length > 0 ? (
               <div className="space-y-3">
-                {topAttendees.map((attendee, index) => (
+                {topAttendees.map((attendee) => (
                   <div key={attendee.email} className="flex items-center gap-3">
                     <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-pink-500 text-white font-semibold text-sm">
                       {attendee.name.charAt(0).toUpperCase()}

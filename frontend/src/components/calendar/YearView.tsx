@@ -95,7 +95,9 @@ export function YearView({ events = [], onDateClick, currentDate = new Date() }:
                 {hasEvents && !isCurrentDay && (
                   <span 
                     className="absolute bottom-0.5 w-1 h-1 rounded-full"
-                    style={{ backgroundColor: eventColor }}
+                    style={{
+                      backgroundColor: eventColor,
+                    } as React.CSSProperties}
                   />
                 )}
               </button>
@@ -113,6 +115,7 @@ export function YearView({ events = [], onDateClick, currentDate = new Date() }:
         <button
           onClick={() => setSelectedYear(y => y - 1)}
           className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+          aria-label="Previous year"
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
@@ -124,6 +127,7 @@ export function YearView({ events = [], onDateClick, currentDate = new Date() }:
         <button
           onClick={() => setSelectedYear(y => y + 1)}
           className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+          aria-label="Next year"
         >
           <ChevronRight className="w-5 h-5" />
         </button>

@@ -25,13 +25,13 @@ export function useRealtimeMeetings() {
 
           // Show user-friendly notifications
           if (payload.eventType === "INSERT") {
-            const meeting = payload.new as any;
+            const meeting = payload.new as Record<string, unknown>;
             toast.success("New meeting scheduled!", {
               description: `Meeting with ${meeting.guestName || "guest"}`,
             });
           } else if (payload.eventType === "UPDATE") {
-            const oldMeeting = payload.old as any;
-            const newMeeting = payload.new as any;
+            const oldMeeting = payload.old as Record<string, unknown>;
+            const newMeeting = payload.new as Record<string, unknown>;
 
             if (newMeeting.status === "CANCELLED" && oldMeeting.status !== "CANCELLED") {
               toast.warning("Meeting cancelled", {

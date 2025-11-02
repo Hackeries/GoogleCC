@@ -45,7 +45,7 @@ export function useRealtimeEvents() {
           if (payload.eventType === "INSERT") {
             toast.success("New meeting scheduled!");
           } else if (payload.eventType === "UPDATE") {
-            const newStatus = (payload.new as any)?.status;
+            const newStatus = (payload.new as Record<string, unknown>)?.status;
             if (newStatus === "CANCELLED") {
               toast.warning("Meeting cancelled");
             } else {

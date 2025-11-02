@@ -2,8 +2,6 @@ import PageTitle from "@/components/PageTitle";
 import { 
   User, 
   Bell, 
-  Globe, 
-  Shield, 
   Zap,
   Save,
   Calendar,

@@ -5,6 +5,7 @@ import {
   GetAllIntegrationResponseType,
   LoginResponseType,
   loginType,
+  MeetingType,
   PeriodType,
   PublicAvailabilityEventResponseType,
   PublicEventResponseType,
@@ -122,7 +123,7 @@ export const rescheduleMeetingMutationFn = async (data: {
   meetingId: string;
   startTime: string;
   endTime: string;
-}): Promise<{ message: string; meeting: any }> => {
+}): Promise<{ message: string; meeting: MeetingType }> => {
   const response = await API.put(`/meeting/reschedule/${data.meetingId}`, {
     startTime: data.startTime,
     endTime: data.endTime,
