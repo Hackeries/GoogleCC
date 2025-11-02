@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { Calendar, dateFnsLocalizer, View as BigCalendarView } from "react-big-calendar";
+import { Calendar, dateFnsLocalizer } from "react-big-calendar";
 import { format, parse, startOfWeek, getDay } from "date-fns";
 import { enUS } from "date-fns/locale";
 import "react-big-calendar/lib/css/react-big-calendar.css";
@@ -39,7 +39,7 @@ const localizer = dateFnsLocalizer({
 });
 
 interface CalendarEvent {
-  id?: string;
+  id: string;
   title: string;
   start: Date;
   end: Date;
@@ -64,7 +64,9 @@ const EnhancedCalendar = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isEventDetailsOpen, setIsEventDetailsOpen] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<SlotInfo | null>(null);
-  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(
+    null
+  );
   const [newEventTitle, setNewEventTitle] = useState("");
   const [newEventDescription, setNewEventDescription] = useState("");
   const [newEventColor, setNewEventColor] = useState("#1a73e8");
@@ -110,16 +112,16 @@ const EnhancedCalendar = () => {
   // Convert meetings to calendar events
   useEffect(() => {
     if (meetingsData?.meetings) {
-      const calendarEvents: CalendarEvent[] = meetingsData.meetings.map(
-        (meeting) => ({
+      const calendarEvents: CalendarEvent[] = meetingsData.meetings
+        .filter((meeting) => meeting.id) // Only include meetings with IDs
+        .map((meeting) => ({
           id: meeting.id,
           title: meeting.event?.title || meeting.guestName,
           start: new Date(meeting.startTime),
           end: new Date(meeting.endTime),
           description: meeting.additionalInfo,
           color: "#1a73e8",
-        })
-      );
+        }));
       setEvents(calendarEvents);
     }
   }, [meetingsData]);
@@ -138,7 +140,15 @@ const EnhancedCalendar = () => {
 
   // Handle event drop (drag and drop)
   const handleEventDrop = useCallback(
-    ({ event, start, end }: { event: CalendarEvent; start: Date; end: Date }) => {
+    ({
+      event,
+      start,
+      end,
+    }: {
+      event: CalendarEvent;
+      start: Date;
+      end: Date;
+    }) => {
       if (!event.id) {
         toast.error("Cannot reschedule this event");
         return;
@@ -161,7 +171,15 @@ const EnhancedCalendar = () => {
 
   // Handle event resize
   const handleEventResize = useCallback(
-    ({ event, start, end }: { event: CalendarEvent; start: Date; end: Date }) => {
+    ({
+      event,
+      start,
+      end,
+    }: {
+      event: CalendarEvent;
+      start: Date;
+      end: Date;
+    }) => {
       if (!event.id) {
         toast.error("Cannot resize this event");
         return;
@@ -281,7 +299,7 @@ const EnhancedCalendar = () => {
                 className="h-full"
               >
                 <YearView
-                  events={events as any}
+                  events={events}
                   currentDate={currentDate}
                   onDateClick={(date) => {
                     setCurrentDate(date);
@@ -316,9 +334,11 @@ const EnhancedCalendar = () => {
                           <div className="flex items-start gap-4">
                             <div
                               className="w-1 h-full rounded"
-                              style={{
-                                backgroundColor: event.color,
-                              } as React.CSSProperties}
+                              style={
+                                {
+                                  backgroundColor: event.color,
+                                } as React.CSSProperties
+                              }
                             />
                             <div className="flex-1">
                               <h3 className="font-semibold text-gray-900 dark:text-white">
@@ -361,7 +381,7 @@ const EnhancedCalendar = () => {
                   startAccessor="start"
                   endAccessor="end"
                   style={{ height: "100%" }}
-                  view={currentView as any}
+                  view={currentView as "month" | "week" | "day"}
                   onView={() => {}} // Controlled by our custom view selector
                   date={currentDate}
                   onNavigate={setCurrentDate}
@@ -417,11 +437,15 @@ const EnhancedCalendar = () => {
                     key={color.value}
                     onClick={() => setNewEventColor(color.value)}
                     className={`w-8 h-8 rounded-full transition-transform ${
-                      newEventColor === color.value ? "scale-110 ring-2 ring-offset-2 ring-gray-400" : ""
+                      newEventColor === color.value
+                        ? "scale-110 ring-2 ring-offset-2 ring-gray-400"
+                        : ""
                     }`}
-                    style={{
-                      backgroundColor: color.value,
-                    } as React.CSSProperties}
+                    style={
+                      {
+                        backgroundColor: color.value,
+                      } as React.CSSProperties
+                    }
                     title={color.name}
                   />
                 ))}
@@ -453,10 +477,13 @@ const EnhancedCalendar = () => {
             <DialogTitle>{selectedEvent?.title}</DialogTitle>
             <DialogDescription>
               {selectedEvent &&
-                `${format(selectedEvent.start, "EEEE, MMMM d, yyyy")} ? ${format(
+                `${format(
                   selectedEvent.start,
+                  "EEEE, MMMM d, yyyy"
+                )} ? ${format(selectedEvent.start, "h:mm a")} - ${format(
+                  selectedEvent.end,
                   "h:mm a"
-                )} - ${format(selectedEvent.end, "h:mm a")}`}
+                )}`}
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
@@ -471,9 +498,11 @@ const EnhancedCalendar = () => {
             <div className="mt-4 flex items-center gap-2">
               <div
                 className="w-4 h-4 rounded"
-                style={{
-                  backgroundColor: selectedEvent?.color,
-                } as React.CSSProperties}
+                style={
+                  {
+                    backgroundColor: selectedEvent?.color,
+                  } as React.CSSProperties
+                }
               />
               <span className="text-sm text-gray-600 dark:text-gray-400">
                 Event color
