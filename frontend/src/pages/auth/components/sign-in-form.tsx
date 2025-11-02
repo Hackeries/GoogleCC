@@ -33,7 +33,6 @@ type SignInFormValues = z.infer<typeof signInSchema>;
 
 export function SignInForm({
   className,
-  ...props
 }: React.ComponentPropsWithoutRef<"div">) {
   const navigate = useNavigate();
   const { setUser, setAccessToken, setExpiresAt } = useStore();
@@ -74,7 +73,6 @@ export function SignInForm({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
       className={cn("flex flex-col gap-6 w-full", className)}
-      {...props}
     >
       <Form {...form}>
         <form

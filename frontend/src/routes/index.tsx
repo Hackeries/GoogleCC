@@ -8,7 +8,6 @@ import AppLayout from "@/layout/app-layout";
 import BaseLayout from "@/layout/base-layout";
 import AuthRoute from "./authRoute";
 import ProtectedRoute from "./protectedRoute";
-import MyCalendar from "@/pages/calendar/MyCalendar"; // ✅ import your calendar page
 
 function AppRoutes() {
   return (
@@ -32,18 +31,14 @@ function AppRoutes() {
       {/* ---------- PROTECTED ROUTES (Require Login) ---------- */}
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
-          {/* ✅ Custom Calendar Route */}
-          <Route path="/app/my-calendar" element={<MyCalendar />} />
-
-          {/* Existing protected routes */}
           {protectedRoutePaths.map((route) => (
             <Route key={route.path} path={route.path} element={route.element} />
           ))}
 
-          {/* ✅ Redirect /app → /app/my-calendar */}
+          {/* Redirect /app to Dashboard */}
           <Route
             path="/app"
-            element={<Navigate to="/app/my-calendar" replace />}
+            element={<Navigate to="/app/dashboard" replace />}
           />
         </Route>
       </Route>

@@ -34,7 +34,6 @@ type SignUpFormValues = z.infer<typeof signUpSchema>;
 
 export function SignUpForm({
   className,
-  ...props
 }: React.ComponentPropsWithoutRef<"div">) {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
@@ -72,7 +71,6 @@ export function SignUpForm({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
       className={cn("flex flex-col gap-6 w-full", className)}
-      {...props}
     >
       <Form {...form}>
         <form

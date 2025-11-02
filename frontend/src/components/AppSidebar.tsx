@@ -167,7 +167,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     hover:!bg-[#e8f0fe] data-[active=true]:!bg-[#dbeafe]
                     transition-all duration-200 ease-in-out
                   `}
-                  isActive={item.url === pathname}
+                  isActive={pathname === item.url || pathname.startsWith(item.url + "/")}
                   asChild
                 >
                   <Link
@@ -176,7 +176,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   >
                     <item.icon
                       className={`!w-5 !h-5 transition-all duration-200 ${
-                        item.url === pathname
+                        pathname === item.url || pathname.startsWith(item.url + "/")
                           ? "text-[#1a73e8]"
                           : "text-gray-600 group-hover:text-[#1a73e8]"
                       }`}

@@ -60,7 +60,7 @@ export const connectAppController = asyncHandlerAndValidation(
     const { url } = await connectAppService(userId, appTypeDto.appType);
 
     return res.status(HTTPSTATUS.OK).json({
-      url,
+      redirectUrl: url,
     });
   }
 );
