@@ -53,4 +53,8 @@ export const useStoreBase = create<StoreType>()(
   )
 );
 
+// ✅ Create memoized selectors
 export const useStore = createSelectors(useStoreBase);
+
+// ✅ Add named export for backward compatibility
+export const useAuthStore = useStoreBase;
