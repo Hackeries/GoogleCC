@@ -1,32 +1,12 @@
 {
-  "version": 2,
-  "builds": [
+  "buildCommand": "cd frontend && npm run build",
+  "outputDirectory": "frontend/dist",
+  "installCommand": "cd frontend && npm install",
+  "framework": "vite",
+  "rewrites": [
     {
-      "src": "frontend/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "frontend/dist"
-      }
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/frontend/$1"
-    }
-  ],
-  "env": {
-    "VITE_APP_ORIGIN": "https://googlecc.onrender.com",
-    "VITE_API_BASE_URL": "https://googlecc.onrender.com/api",
-    "VITE_SUPABASE_URL": "https://afnshpbvmjxfevwkznkp.supabase.co",
-    "VITE_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFmbnNocGJ2bWp4ZmV2d2t6bmtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIwNjEyODQsImV4cCI6MjA3NzYzNzI4NH0.hamb2aa4A0-JyoeNkA_kD4LMKqi2QzFtyanvi8LM6js"
-  },
-  "build": {
-    "env": {
-      "VITE_APP_ORIGIN": "https://googlecc.onrender.com",
-      "VITE_API_BASE_URL": "https://googlecc.onrender.com/api",
-      "VITE_SUPABASE_URL": "https://afnshpbvmjxfevwkznkp.supabase.co",
-      "VITE_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFmbnNocGJ2bWp4ZmV2d2t6bmtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIwNjEyODQsImV4cCI6MjA3NzYzNzI4NH0.hamb2aa4A0-JyoeNkA_kD4LMKqi2QzFtyanvi8LM6js"
-    }
-  }
+  ]
 }

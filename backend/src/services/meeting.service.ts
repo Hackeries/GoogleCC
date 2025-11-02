@@ -76,9 +76,9 @@ export const createMeetBookingForGuestService = async (
     where: {
       user: { id: event.user.id },
       app_type:
-        event.locationType === EventLocationEnumType.GOOGLE_MEET
+        event.locationType === EventLocationEnumType.GOOGLE_MEET_AND_CALENDAR
           ? IntegrationAppTypeEnum.GOOGLE_MEET_AND_CALENDAR
-          : event.locationType === EventLocationEnumType.ZOOM
+          : event.locationType === EventLocationEnumType.ZOOM_MEETING
           ? IntegrationAppTypeEnum.ZOOM_MEETING
           : IntegrationAppTypeEnum.OUTLOOK_CALENDAR,
     },
@@ -91,7 +91,7 @@ export const createMeetBookingForGuestService = async (
   let calendarEventId: string = "";
   let calendarAppType: string = "";
 
-  if (event.locationType === EventLocationEnumType.GOOGLE_MEET) {
+  if (event.locationType === EventLocationEnumType.GOOGLE_MEET_AND_CALENDAR) {
     const { calendarType, calendar } = await getCalendarClient(
       meetIntegration.app_type,
       meetIntegration.access_token,

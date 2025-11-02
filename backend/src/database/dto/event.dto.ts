@@ -25,12 +25,9 @@ export class CreateEventDto {
   @IsNotEmpty({ message: "Duration is required" })
   duration: number;
 
-  // ✅ Accept either locationType or LocationType
-  @ValidateIf((o) => o.locationType || o.LocationType)
-  @Transform(({ obj }) => obj.locationType || obj.LocationType)
   @IsEnum(EventLocationEnumType, {
     message:
-      "Invalid location type. Must be one of: GOOGLE_MEET_AND_CALENDAR, ZOOM, MICROSOFT_TEAMS",
+      "Invalid location type. Must be one of: GOOGLE_MEET_AND_CALENDAR, ZOOM_MEETING, MICROSOFT_TEAMS, PHYSICAL, OTHER",
   })
   @IsNotEmpty({ message: "Location type is required" })
   locationType: EventLocationEnumType;
