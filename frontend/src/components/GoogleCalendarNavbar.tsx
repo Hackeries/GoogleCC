@@ -190,24 +190,24 @@ export function GoogleCalendarNavbar({
             </div>
             <div className="grid grid-cols-3 gap-4">
               {[
-                { name: "Gmail", icon: "??", color: "bg-red-100" },
-                { name: "Drive", icon: "??", color: "bg-blue-100" },
-                { name: "Meet", icon: "??", color: "bg-green-100" },
-                { name: "Chat", icon: "??", color: "bg-purple-100" },
-                { name: "Docs", icon: "??", color: "bg-blue-100" },
-                { name: "Sheets", icon: "??", color: "bg-green-100" },
-                { name: "Slides", icon: "???", color: "bg-yellow-100" },
-                { name: "Keep", icon: "???", color: "bg-yellow-100" },
-                { name: "Tasks", icon: "?", color: "bg-blue-100" },
+                { name: "Gmail", color: "bg-red-100", icon: "M" },
+                { name: "Drive", color: "bg-blue-100", icon: "D" },
+                { name: "Meet", color: "bg-green-100", icon: "M" },
+                { name: "Chat", color: "bg-purple-100", icon: "C" },
+                { name: "Docs", color: "bg-blue-100", icon: "D" },
+                { name: "Sheets", color: "bg-green-100", icon: "S" },
+                { name: "Slides", color: "bg-yellow-100", icon: "S" },
+                { name: "Keep", color: "bg-yellow-100", icon: "K" },
+                { name: "Tasks", color: "bg-blue-100", icon: "T" },
               ].map((app) => (
                 <button
                   key={app.name}
                   className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-50 transition-colors"
                 >
-                  <div className={`w-12 h-12 rounded-lg ${app.color} flex items-center justify-center text-2xl`}>
+                  <div className={`w-12 h-12 rounded-lg ${app.color} flex items-center justify-center text-xl font-bold text-gray-700`}>
                     {app.icon}
                   </div>
-                  <span className="text-xs text-gray-700">{app.name}</span>
+                  <span className="text-xs text-gray-700 font-medium">{app.name}</span>
                 </button>
               ))}
             </div>
