@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Plus, ChevronDown, Search, Calendar, Check } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Plus, Search, Calendar, Check } from "lucide-react";
+import { motion } from "framer-motion";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import {

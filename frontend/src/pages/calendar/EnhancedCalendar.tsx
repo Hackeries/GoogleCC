@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { Calendar, dateFnsLocalizer, View } from "react-big-calendar";
+import { Calendar, dateFnsLocalizer, View as BigCalendarView } from "react-big-calendar";
 import { format, parse, startOfWeek, getDay } from "date-fns";
 import { enUS } from "date-fns/locale";
 import "react-big-calendar/lib/css/react-big-calendar.css";
@@ -316,7 +316,9 @@ const EnhancedCalendar = () => {
                           <div className="flex items-start gap-4">
                             <div
                               className="w-1 h-full rounded"
-                              style={{ backgroundColor: event.color }}
+                              style={{
+                                backgroundColor: event.color,
+                              } as React.CSSProperties}
                             />
                             <div className="flex-1">
                               <h3 className="font-semibold text-gray-900 dark:text-white">
@@ -359,7 +361,7 @@ const EnhancedCalendar = () => {
                   startAccessor="start"
                   endAccessor="end"
                   style={{ height: "100%" }}
-                  view={currentView as View}
+                  view={currentView as BigCalendarView}
                   onView={() => {}} // Controlled by our custom view selector
                   date={currentDate}
                   onNavigate={setCurrentDate}
@@ -417,7 +419,9 @@ const EnhancedCalendar = () => {
                     className={`w-8 h-8 rounded-full transition-transform ${
                       newEventColor === color.value ? "scale-110 ring-2 ring-offset-2 ring-gray-400" : ""
                     }`}
-                    style={{ backgroundColor: color.value }}
+                    style={{
+                      backgroundColor: color.value,
+                    } as React.CSSProperties}
                     title={color.name}
                   />
                 ))}
@@ -467,7 +471,9 @@ const EnhancedCalendar = () => {
             <div className="mt-4 flex items-center gap-2">
               <div
                 className="w-4 h-4 rounded"
-                style={{ backgroundColor: selectedEvent?.color }}
+                style={{
+                  backgroundColor: selectedEvent?.color,
+                } as React.CSSProperties}
               />
               <span className="text-sm text-gray-600 dark:text-gray-400">
                 Event color
