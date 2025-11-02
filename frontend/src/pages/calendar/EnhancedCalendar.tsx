@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { Calendar, dateFnsLocalizer, View as BigCalendarView } from "react-big-calendar";
+import { Calendar, dateFnsLocalizer, View } from "react-big-calendar";
 import { format, parse, startOfWeek, getDay } from "date-fns";
 import { enUS } from "date-fns/locale";
 import "react-big-calendar/lib/css/react-big-calendar.css";
@@ -281,7 +281,7 @@ const EnhancedCalendar = () => {
                 className="h-full"
               >
                 <YearView
-                  events={events as any}
+                  events={events}
                   currentDate={currentDate}
                   onDateClick={(date) => {
                     setCurrentDate(date);
@@ -361,7 +361,7 @@ const EnhancedCalendar = () => {
                   startAccessor="start"
                   endAccessor="end"
                   style={{ height: "100%" }}
-                  view={currentView as any}
+                  view={currentView as View}
                   onView={() => {}} // Controlled by our custom view selector
                   date={currentDate}
                   onNavigate={setCurrentDate}
