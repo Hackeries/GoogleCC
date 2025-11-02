@@ -9,7 +9,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -20,21 +19,27 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { PlusIcon } from "lucide-react";
 import { locationOptions, VideoConferencingPlatform } from "@/lib/types";
 import { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { PROTECTED_ROUTES } from "@/routes/common/routePaths";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
-import { checkIntegrationQueryFn, CreateEventMutationFn, getAllIntegrationQueryFn } from "@/lib/api";
+import { checkIntegrationQueryFn, updateEventMutationFn, getAllIntegrationQueryFn } from "@/lib/api";
 import { toast } from "sonner";
 import { Loader } from "@/components/loader";
+import { EventType } from "@/types/api.type";
 
-const NewEventDialog = ({ btnVariant }: { btnVariant?: string }) => {
+interface EditEventDialogProps {
+  event: EventType | null;
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const EditEventDialog = ({ event, isOpen, onClose }: EditEventDialogProps) => {
   const queryClient = useQueryClient();
   const { mutate, isPending } = useMutation({
-    mutationFn: CreateEventMutationFn,
+    mutationFn: updateEventMutationFn,
   });
 
   const [selectedLocationType, setSelectedLocationType] =
@@ -42,9 +47,8 @@ const NewEventDialog = ({ btnVariant }: { btnVariant?: string }) => {
   const [error, setError] = useState<string | null>(null);
   const [isChecking, setIsChecking] = useState(false);
   const [appConnected, setAppConnected] = useState<boolean>(false);
-  const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  // ✅ Fetch all integrations to check connection status with real-time polling
+  // ? Fetch all integrations to check connection status with real-time polling
   const { data: integrationsData } = useQuery({
     queryKey: ["integrations"],
     queryFn: getAllIntegrationQueryFn,
@@ -53,7 +57,7 @@ const NewEventDialog = ({ btnVariant }: { btnVariant?: string }) => {
     enabled: isOpen, // Only fetch when dialog is open
   });
 
-  // ✅ Schema
+  // ? Schema
   const eventSchema = z.object({
     title: z.string().min(1, "Event name is required"),
     duration: z
@@ -80,7 +84,30 @@ const NewEventDialog = ({ btnVariant }: { btnVariant?: string }) => {
 
   const { isValid } = form.formState;
 
-  // ✅ Real-time sync: Update connection status when integrations data changes
+  // ? Populate form when event changes
+  useEffect(() => {
+    if (event && isOpen) {
+      form.reset({
+        title: event.title,
+        duration: event.duration,
+        description: event.description || "",
+        locationType: event.locationType,
+      });
+      setSelectedLocationType(event.locationType);
+      
+      // Check if the location type is connected
+      if (event.locationType === VideoConferencingPlatform.GOOGLE_MEET_AND_CALENDAR) {
+        const googleMeetIntegration = integrationsData?.integrations.find(
+          (integration) => integration.app_type === "GOOGLE_MEET_AND_CALENDAR"
+        );
+        setAppConnected(!!googleMeetIntegration?.isConnected);
+      } else {
+        setAppConnected(true);
+      }
+    }
+  }, [event, isOpen, form, integrationsData]);
+
+  // ? Real-time sync: Update connection status when integrations data changes
   useEffect(() => {
     if (isOpen && integrationsData?.integrations) {
       const googleMeetIntegration = integrationsData.integrations.find(
@@ -109,7 +136,7 @@ const NewEventDialog = ({ btnVariant }: { btnVariant?: string }) => {
 
     // Only check for Google Meet integration
     if (value === VideoConferencingPlatform.GOOGLE_MEET_AND_CALENDAR) {
-      // ✅ First check from the fetched integrations data (cache) - real-time synced
+      // ? First check from the fetched integrations data (cache) - real-time synced
       const googleMeetIntegration = integrationsData?.integrations.find(
         (integration) => integration.app_type === "GOOGLE_MEET_AND_CALENDAR"
       );
@@ -121,7 +148,7 @@ const NewEventDialog = ({ btnVariant }: { btnVariant?: string }) => {
         return;
       }
 
-      // ✅ If not found in cache, check via API call
+      // ? If not found in cache, check via API call
       setIsChecking(true);
       try {
         const { isConnected } = await checkIntegrationQueryFn(
@@ -155,61 +182,36 @@ const NewEventDialog = ({ btnVariant }: { btnVariant?: string }) => {
   };
 
   const onSubmit = (data: EventFormData) => {
+    if (!event) return;
+
     const payload = {
+      eventId: event.id,
       title: data.title,
       duration: data.duration,
       description: data.description || "",
       locationType: data.locationType,
     };
 
-    console.log("✅ Form Data (payload):", payload);
-
     mutate(payload, {
-      onSuccess: (response) => {
+      onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["event_list"] });
         queryClient.invalidateQueries({ queryKey: ["integrations"] });
-        setSelectedLocationType(null);
-        setIsOpen(false);
-        setAppConnected(false);
-        setError(null);
-        form.reset();
-        
-        // ✨ Professional success notification with details
-        toast.success("🎉 Event Created Successfully!", {
-          description: `"${data.title}" is now ready for bookings!`,
-          duration: 5000,
-        });
+        onClose();
+        toast.success("Event updated successfully!");
       },
-      onError: (error: any) => {
-        toast.error("Failed to create event", {
-          description: error?.response?.data?.message || "Please try again later",
-        });
+      onError: () => {
+        toast.error("Failed to update event");
       },
     });
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button
-          variant={btnVariant ? "default" : "outline"}
-          size="lg"
-          className={cn(
-            `!w-auto !border-2 !border-blue-500 !text-blue-600 !font-semibold !text-base hover:bg-blue-50 transition-all duration-300 shadow-md hover:shadow-xl`,
-            btnVariant && "!text-white !bg-gradient-to-r !from-blue-500 !to-purple-600 hover:!from-blue-600 hover:!to-purple-700 !border-none"
-          )}
-        >
-          <PlusIcon className="w-5 h-5" />
-          <span>New Event Type</span>
-        </Button>
-
-      </DialogTrigger>
-
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto !px-0 pb-0">
         <DialogHeader className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-6">
-          <DialogTitle className="text-2xl font-bold">✨ Create Event Type</DialogTitle>
+          <DialogTitle className="text-2xl font-bold">?? Edit Event Type</DialogTitle>
           <DialogDescription className="text-blue-100 text-base">
-            Set up a new event type for seamless scheduling
+            Update your event details
           </DialogDescription>
         </DialogHeader>
 
@@ -223,7 +225,7 @@ const NewEventDialog = ({ btnVariant }: { btnVariant?: string }) => {
                 render={({ field }) => (
                   <FormItem>
                     <Label className="font-semibold !text-base text-gray-700">
-                      📝 Event name *
+                      ?? Event name *
                     </Label>
                     <FormControl className="mt-2">
                       <Input 
@@ -244,7 +246,7 @@ const NewEventDialog = ({ btnVariant }: { btnVariant?: string }) => {
                 render={({ field }) => (
                   <FormItem>
                     <Label className="font-semibold !text-base text-gray-700">
-                      💬 Description
+                      ?? Description
                     </Label>
                     <FormControl className="mt-2">
                       <Textarea
@@ -265,7 +267,7 @@ const NewEventDialog = ({ btnVariant }: { btnVariant?: string }) => {
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <Label className="font-semibold !text-base text-gray-700">⏱️ Duration (minutes) *</Label>
+                    <Label className="font-semibold !text-base text-gray-700">?? Duration (minutes) *</Label>
                     <FormControl className="mt-2">
                       <Input
                         {...field}
@@ -292,7 +294,7 @@ const NewEventDialog = ({ btnVariant }: { btnVariant?: string }) => {
                 render={() => (
                   <FormItem>
                     <Label className="font-semibold !text-base text-gray-700">
-                      🔗 Meeting Platform *
+                      ?? Meeting Platform *
                     </Label>
                     <FormControl className="w-full mt-2">
                       <div className="grid grid-cols-4 gap-3">
@@ -300,7 +302,7 @@ const NewEventDialog = ({ btnVariant }: { btnVariant?: string }) => {
                           <button
                             key={option.value}
                             type="button"
-                            title={option.label} // ✅ accessibility fix
+                            title={option.label} // ? accessibility fix
                             className={cn(
                               `relative w-full h-[85px] cursor-pointer border-2 disabled:pointer-events-none border-gray-300 mx-auto rounded-xl flex flex-col items-center justify-center transition-all duration-200 hover:shadow-lg`,
                               selectedLocationType === option.value &&
@@ -340,7 +342,7 @@ const NewEventDialog = ({ btnVariant }: { btnVariant?: string }) => {
                                   {option.label}
                                 </span>
                                 {appConnected && selectedLocationType === option.value && (
-                                  <span className="absolute top-1 right-1 text-green-500 text-lg">✓</span>
+                                  <span className="absolute top-1 right-1 text-green-500 text-lg">?</span>
                                 )}
                               </>
                             )}
@@ -369,7 +371,7 @@ const NewEventDialog = ({ btnVariant }: { btnVariant?: string }) => {
               <Button 
                 type="button" 
                 variant="outline" 
-                onClick={() => setIsOpen(false)}
+                onClick={onClose}
                 className="flex-1 h-12 text-base font-medium"
               >
                 Cancel
@@ -381,13 +383,13 @@ const NewEventDialog = ({ btnVariant }: { btnVariant?: string }) => {
               >
                 {isPending ? (
                   <span className="flex items-center gap-2">
-                    <span className="animate-spin">⏳</span>
-                    Creating...
+                    <span className="animate-spin">?</span>
+                    Updating...
                   </span>
                 ) : (
                   <span className="flex items-center gap-2">
-                    <span>✨</span>
-                    Create Event Type
+                    <span>??</span>
+                    Save Changes
                   </span>
                 )}
               </Button>
@@ -399,4 +401,4 @@ const NewEventDialog = ({ btnVariant }: { btnVariant?: string }) => {
   );
 };
 
-export default NewEventDialog;
+export default EditEventDialog;

@@ -150,3 +150,41 @@ export const deleteEventService = async (userId: string, eventId: string) => {
 
   return { success: true };
 };
+
+export const updateEventService = async (
+  userId: string,
+  eventId: string,
+  updateData: Partial<CreateEventDto>
+) => {
+  const eventRepository = AppDataSource.getRepository(Event);
+
+  const event = await eventRepository.findOne({
+    where: { id: eventId, user: { id: userId } },
+  });
+
+  if (!event) {
+    throw new NotFoundException("Event not found");
+  }
+
+  // Update only provided fields
+  if (updateData.title) {
+    event.title = updateData.title;
+    event.slug = slugify(updateData.title);
+  }
+  if (updateData.description !== undefined) {
+    event.description = updateData.description;
+  }
+  if (updateData.duration) {
+    event.duration = updateData.duration;
+  }
+  if (updateData.locationType) {
+    if (!Object.values(EventLocationEnumType).includes(updateData.locationType)) {
+      throw new BadRequestException("Invalid location type");
+    }
+    event.locationType = updateData.locationType;
+  }
+
+  await eventRepository.save(event);
+
+  return event;
+};

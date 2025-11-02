@@ -61,6 +61,27 @@ export const getEventListQueryFn = async (): Promise<UserEventListResponse> => {
   return response.data;
 };
 
+export const deleteEventMutationFn = async (eventId: string): Promise<{ message: string }> => {
+  const response = await API.delete(`/events/${eventId}`);
+  return response.data;
+};
+
+export const updateEventMutationFn = async (data: {
+  eventId: string;
+  title: string;
+  description: string;
+  duration: number;
+  locationType: VideoConferencingPlatform;
+}): Promise<{ message: string; data: EventType }> => {
+  const response = await API.put(`/events/${data.eventId}`, {
+    title: data.title,
+    description: data.description,
+    duration: data.duration,
+    locationType: data.locationType,
+  });
+  return response.data;
+};
+
 // =========================
 // 🔗 INTEGRATION APIS
 // =========================
