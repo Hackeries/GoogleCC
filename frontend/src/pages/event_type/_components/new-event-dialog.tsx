@@ -77,9 +77,9 @@ const NewEventDialog = ({ btnVariant }: { btnVariant?: string }) => {
 
   const { isValid } = form.formState;
 
-  // ✅ Check if Google Meet is connected when integrations data loads
+  // ✅ Check if Google Meet is connected when integrations data loads or dialog opens
   useEffect(() => {
-    if (integrationsData?.data?.integrations) {
+    if (isOpen && integrationsData?.data?.integrations) {
       const googleMeetIntegration = integrationsData.data.integrations.find(
         (integration) => integration.appType === "GOOGLE_MEET_AND_CALENDAR"
       );
@@ -88,26 +88,27 @@ const NewEventDialog = ({ btnVariant }: { btnVariant?: string }) => {
         setError(null);
       }
     }
-  }, [integrationsData, selectedLocationType]);
+  }, [integrationsData, selectedLocationType, isOpen]);
 
   const handleLocationTypeChange = async (value: VideoConferencingPlatform) => {
     setSelectedLocationType(value);
     setError(null);
+    form.setValue("locationType", value);
 
+    // Only check for Google Meet integration
     if (value === VideoConferencingPlatform.GOOGLE_MEET_AND_CALENDAR) {
-      // ✅ Check if already connected from the fetched integrations data
+      // ✅ First check from the fetched integrations data (cache)
       const googleMeetIntegration = integrationsData?.data?.integrations.find(
         (integration) => integration.appType === "GOOGLE_MEET_AND_CALENDAR"
       );
 
       if (googleMeetIntegration?.isConnected) {
         setAppConnected(true);
-        form.setValue("locationType", value);
         form.trigger("locationType");
         return;
       }
 
-      // ✅ If not found in cache, check via API
+      // ✅ If not found in cache, check via API call
       setIsChecking(true);
       try {
         const { connected } = await checkIntegrationQueryFn(
@@ -116,26 +117,27 @@ const NewEventDialog = ({ btnVariant }: { btnVariant?: string }) => {
 
         if (!connected) {
           setError(
-            `Google Meet is not connected. <a href=${PROTECTED_ROUTES.INTEGRATIONS} target="_blank" class='underline text-primary'>Visit the integration page</a> to connect your account.`
+            `Google Meet is not connected. <a href="${PROTECTED_ROUTES.INTEGRATIONS}" target="_blank" rel="noopener noreferrer" class="underline text-primary">Visit the integration page</a> to connect your account.`
           );
           setAppConnected(false);
+          form.trigger("locationType");
           return;
         }
 
         setError(null);
         setAppConnected(true);
-        form.setValue("locationType", value);
         form.trigger("locationType");
       } catch (error) {
         console.error("Integration check failed:", error);
-        setError("Failed to check Google Meet integration status.");
+        setError("Failed to check Google Meet integration status. Please try again.");
         setAppConnected(false);
       } finally {
         setIsChecking(false);
       }
     } else {
-      setAppConnected(false);
-      form.setValue("locationType", value);
+      // For other platforms (Zoom, MS Teams), don't require connection check for now
+      setAppConnected(true);
+      form.trigger("locationType");
     }
   };
 
@@ -182,7 +184,7 @@ const NewEventDialog = ({ btnVariant }: { btnVariant?: string }) => {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[500px] !px-0 pb-0">
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto !px-0 pb-0">
         <DialogHeader className="px-6">
           <DialogTitle className="text-xl">Add a new event type</DialogTitle>
           <DialogDescription>

@@ -2,13 +2,13 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Command, Eye, EyeOff, LogIn } from "lucide-react";
+import { Eye, EyeOff, LogIn } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link, useNavigate } from "react-router-dom";
-import { AUTH_ROUTES, PROTECTED_ROUTES } from "@/routes/common/routePaths";
+import { PROTECTED_ROUTES } from "@/routes/common/routePaths";
 import {
   Form,
   FormControl,
@@ -21,7 +21,6 @@ import { useMutation } from "@tanstack/react-query";
 import { loginMutationFn } from "@/lib/api";
 import { toast } from "sonner";
 import { Loader } from "@/components/loader";
-import { motion } from "framer-motion";
 import { useState } from "react";
 
 const signInSchema = z.object({
@@ -68,143 +67,112 @@ export function SignInForm({
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
-      className={cn("flex flex-col gap-6 w-full", className)}
-    >
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-6 max-w-md mx-auto"
-        >
-          {/* Form Card */}
-          <motion.div
-            initial={{ scale: 0.98, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.1 }}
-            className="w-full bg-white/80 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-gray-100 flex flex-col gap-6"
-          >
-            <div className="flex flex-col gap-4">
-              {/* Email Field */}
-              <FormField
-                name="email"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <Label className="font-medium text-sm">Email address</Label>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type="email"
-                        placeholder="you@example.com"
-                        className="transition-all focus:ring-2 focus:ring-blue-500"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Password Field */}
-              <FormField
-                name="password"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <Label className="font-medium text-sm">Password</Label>
-                    <div className="relative">
-                      <FormControl>
-                        <Input
-                          {...field}
-                          type={showPassword ? "text" : "password"}
-                          placeholder="••••••••"
-                          className="pr-10 transition-all focus:ring-2 focus:ring-blue-500"
-                        />
-                      </FormControl>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-1 top-1/2 -translate-y-1/2"
-                        aria-label={
-                          showPassword ? "Hide password" : "Show password"
-                        }
-                      >
-                        {showPassword ? (
-                          <EyeOff size={16} />
-                        ) : (
-                          <Eye size={16} />
-                        )}
-                      </Button>
-                    </div>
-                    <div className="text-right text-xs mt-1">
-                      <Link
-                        to="#"
-                        className="text-blue-600 hover:underline hover:text-blue-700"
-                      >
-                        Forgot password?
-                      </Link>
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            {/* Submit Button */}
-            <motion.div whileTap={{ scale: 0.98 }}>
-              <Button
-                disabled={isPending}
-                type="submit"
-                className="w-full font-semibold tracking-wide"
-              >
-                {isPending ? (
-                  <Loader color="white" />
-                ) : (
-                  <>
-                    <LogIn className="mr-2 h-4 w-4" /> Sign in
-                  </>
-                )}
-              </Button>
-            </motion.div>
-
-            {/* Divider */}
-            <div className="relative text-center text-sm text-muted-foreground">
-              <span className="bg-white px-2 relative z-10">Or</span>
-              <div className="absolute left-0 top-1/2 w-full border-t border-gray-200 z-0" />
-            </div>
-
-            {/* Google Sign In */}
-            <motion.div whileHover={{ scale: 1.02 }}>
-              <Button
-                variant="outline"
-                className="w-full flex gap-2 items-center justify-center hover:bg-gray-100"
-              >
-                <img
-                  src="https://www.svgrepo.com/show/475656/google-color.svg"
-                  alt="Google"
-                  className="w-5 h-5"
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className={cn("space-y-5 w-full", className)}
+      >
+        {/* Email Field */}
+        <FormField
+          name="email"
+          control={form.control}
+          render={({ field }) => (
+            <FormItem>
+              <Label className="font-medium text-sm">Email address</Label>
+              <FormControl>
+                <Input
+                  {...field}
+                  type="email"
+                  placeholder="you@example.com"
+                  className="transition-all focus:ring-2 focus:ring-blue-500"
                 />
-                Continue with Google
-              </Button>
-            </motion.div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-            {/* Footer */}
-            <div className="text-center text-sm text-gray-600">
-              Don’t have an account?{" "}
-              <Link
-                to={AUTH_ROUTES.SIGN_UP}
-                className="text-blue-600 font-medium hover:underline"
-              >
-                Sign up
-              </Link>
-            </div>
-          </motion.div>
-        </form>
-      </Form>
-    </motion.div>
+        {/* Password Field */}
+        <FormField
+          name="password"
+          control={form.control}
+          render={({ field }) => (
+            <FormItem>
+              <Label className="font-medium text-sm">Password</Label>
+              <div className="relative">
+                <FormControl>
+                  <Input
+                    {...field}
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    className="pr-10 transition-all focus:ring-2 focus:ring-blue-500"
+                  />
+                </FormControl>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
+                  aria-label={
+                    showPassword ? "Hide password" : "Show password"
+                  }
+                >
+                  {showPassword ? (
+                    <EyeOff size={16} className="text-gray-500" />
+                  ) : (
+                    <Eye size={16} className="text-gray-500" />
+                  )}
+                </Button>
+              </div>
+              <div className="text-right text-xs mt-1">
+                <Link
+                  to="#"
+                  className="text-blue-600 hover:underline hover:text-blue-700"
+                >
+                  Forgot password?
+                </Link>
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Submit Button */}
+        <Button
+          disabled={isPending}
+          type="submit"
+          className="w-full font-semibold tracking-wide"
+        >
+          {isPending ? (
+            <Loader color="white" />
+          ) : (
+            <>
+              <LogIn className="mr-2 h-4 w-4" /> Sign in
+            </>
+          )}
+        </Button>
+
+        {/* Divider */}
+        <div className="relative text-center text-sm text-muted-foreground">
+          <span className="bg-white px-3 relative z-10">Or continue with</span>
+          <div className="absolute left-0 top-1/2 w-full border-t border-gray-200 z-0" />
+        </div>
+
+        {/* Google Sign In */}
+        <Button
+          variant="outline"
+          type="button"
+          className="w-full flex gap-2 items-center justify-center hover:bg-gray-50 transition-all"
+        >
+          <img
+            src="https://www.svgrepo.com/show/475656/google-color.svg"
+            alt="Google"
+            className="w-5 h-5"
+          />
+          Google
+        </Button>
+      </form>
+    </Form>
   );
 }

@@ -67,9 +67,9 @@ export function GoogleCalendarSidebar({
   };
 
   return (
-    <aside className="w-64 bg-white border-r border-gray-200 flex flex-col h-full">
+    <aside className="w-full h-full bg-white flex flex-col">
       {/* Create Button */}
-      <div className="p-4">
+      <div className="p-3 sm:p-4">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
