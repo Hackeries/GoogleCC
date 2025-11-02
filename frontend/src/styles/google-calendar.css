@@ -1,0 +1,393 @@
+/* Google Calendar Theme Styles */
+
+/* Color Palette - Google Calendar */
+:root {
+  --google-blue: #1a73e8;
+  --google-blue-hover: #1557b0;
+  --google-red: #e67c73;
+  --google-green: #33b679;
+  --google-yellow: #f6bf26;
+  --google-orange: #f4511e;
+  --google-purple: #8e24aa;
+  --google-gray: #616161;
+  
+  /* Background colors */
+  --calendar-bg: #ffffff;
+  --calendar-border: #dadce0;
+  --calendar-hover: #f1f3f4;
+  --calendar-selected: #e8f0fe;
+  
+  /* Text colors */
+  --text-primary: #3c4043;
+  --text-secondary: #5f6368;
+  --text-disabled: #9aa0a6;
+}
+
+.dark {
+  --calendar-bg: #1f1f1f;
+  --calendar-border: #3c4043;
+  --calendar-hover: #2d2d2d;
+  --calendar-selected: #1a3a52;
+  --text-primary: #e8eaed;
+  --text-secondary: #9aa0a6;
+  --text-disabled: #5f6368;
+}
+
+/* React Big Calendar Custom Styles */
+.rbc-calendar {
+  font-family: 'Google Sans', 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.rbc-header {
+  padding: 12px 0;
+  font-weight: 500;
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  letter-spacing: 0.8px;
+  border-bottom: 1px solid var(--calendar-border);
+}
+
+.rbc-today {
+  background-color: var(--calendar-selected);
+}
+
+.rbc-day-bg {
+  border-color: var(--calendar-border);
+}
+
+.rbc-off-range-bg {
+  background-color: var(--calendar-hover);
+}
+
+.rbc-event {
+  padding: 2px 5px;
+  border-radius: 4px;
+  font-size: 12px;
+  border: none !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.rbc-event:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+.rbc-event-label {
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.rbc-event-content {
+  font-weight: 400;
+}
+
+.rbc-selected {
+  background-color: var(--google-blue) !important;
+}
+
+.rbc-slot-selection {
+  background-color: rgba(26, 115, 232, 0.2);
+  border: 1px solid var(--google-blue);
+}
+
+/* Time grid styles */
+.rbc-time-view {
+  border-color: var(--calendar-border);
+}
+
+.rbc-time-header {
+  border-color: var(--calendar-border);
+}
+
+.rbc-time-content {
+  border-color: var(--calendar-border);
+}
+
+.rbc-timeslot-group {
+  border-color: var(--calendar-border);
+  min-height: 60px;
+}
+
+.rbc-time-slot {
+  color: var(--text-secondary);
+  font-size: 10px;
+}
+
+.rbc-current-time-indicator {
+  background-color: var(--google-red);
+  height: 2px;
+}
+
+/* Month view styles */
+.rbc-month-view {
+  border-color: var(--calendar-border);
+}
+
+.rbc-month-row {
+  border-color: var(--calendar-border);
+}
+
+.rbc-date-cell {
+  padding: 8px;
+}
+
+.rbc-button-link {
+  color: var(--text-primary);
+  font-weight: 500;
+  font-size: 13px;
+}
+
+.rbc-button-link:hover {
+  color: var(--google-blue);
+}
+
+/* Week view styles */
+.rbc-time-header-content {
+  border-left-color: var(--calendar-border);
+}
+
+.rbc-day-slot .rbc-time-slot {
+  border-top-color: var(--calendar-border);
+}
+
+/* Drag and drop styles */
+.rbc-addons-dnd .rbc-addons-dnd-resizable {
+  cursor: move;
+}
+
+.rbc-addons-dnd-resizing {
+  opacity: 0.7;
+}
+
+.rbc-addons-dnd .rbc-event {
+  transition: opacity 0.2s;
+}
+
+.rbc-addons-dnd-dragging {
+  opacity: 0.5;
+}
+
+/* Google Calendar specific enhancements */
+.google-calendar-event {
+  position: relative;
+  overflow: hidden;
+}
+
+.google-calendar-event::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background-color: inherit;
+  filter: brightness(0.8);
+}
+
+/* Custom scrollbar */
+.rbc-time-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.rbc-time-content::-webkit-scrollbar-track {
+  background: var(--calendar-hover);
+  border-radius: 4px;
+}
+
+.rbc-time-content::-webkit-scrollbar-thumb {
+  background: var(--calendar-border);
+  border-radius: 4px;
+}
+
+.rbc-time-content::-webkit-scrollbar-thumb:hover {
+  background: var(--text-disabled);
+}
+
+/* Animations */
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromBottom {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-slide-in-right {
+  animation: slideInFromRight 0.3s ease-out;
+}
+
+.animate-slide-in-bottom {
+  animation: slideInFromBottom 0.3s ease-out;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .rbc-toolbar {
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .rbc-toolbar-label {
+    font-size: 18px;
+    margin: 8px 0;
+  }
+
+  .rbc-header {
+    font-size: 10px;
+    padding: 8px 0;
+  }
+
+  .rbc-event {
+    font-size: 11px;
+    padding: 1px 3px;
+  }
+}
+
+/* Touch-friendly styles for mobile */
+@media (max-width: 768px) {
+  .rbc-event {
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+  }
+
+  .rbc-time-slot {
+    min-height: 48px;
+  }
+
+  .rbc-day-bg {
+    min-height: 100px;
+  }
+}
+
+/* Print styles */
+@media print {
+  .rbc-toolbar {
+    display: none;
+  }
+
+  .rbc-event {
+    box-shadow: none !important;
+    page-break-inside: avoid;
+  }
+
+  .rbc-calendar {
+    border: 1px solid #000;
+  }
+}
+
+/* Accessibility improvements */
+.rbc-event:focus {
+  outline: 2px solid var(--google-blue);
+  outline-offset: 2px;
+}
+
+.rbc-day-slot:focus-within {
+  outline: 2px solid var(--google-blue);
+  outline-offset: -2px;
+}
+
+/* Loading state */
+.calendar-loading {
+  position: relative;
+  overflow: hidden;
+}
+
+.calendar-loading::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(26, 115, 232, 0.1),
+    transparent
+  );
+  animation: loading-shimmer 1.5s infinite;
+}
+
+@keyframes loading-shimmer {
+  to {
+    left: 100%;
+  }
+}
+
+/* Event color variations */
+.event-blue { background-color: #1a73e8 !important; }
+.event-red { background-color: #e67c73 !important; }
+.event-green { background-color: #33b679 !important; }
+.event-yellow { background-color: #f6bf26 !important; color: #000 !important; }
+.event-orange { background-color: #f4511e !important; }
+.event-purple { background-color: #8e24aa !important; }
+.event-gray { background-color: #616161 !important; }
+
+/* Smooth transitions */
+.rbc-day-bg,
+.rbc-event,
+.rbc-time-slot,
+.rbc-button-link {
+  transition: all 0.2s ease;
+}
+
+/* Hour labels in time grid */
+.rbc-label {
+  font-size: 10px;
+  color: var(--text-secondary);
+  font-weight: 400;
+  padding-right: 8px;
+}
+
+/* All-day event section */
+.rbc-allday-cell {
+  background-color: var(--calendar-hover);
+  border-bottom: 2px solid var(--calendar-border);
+}
+
+/* Today button highlight effect */
+.rbc-today {
+  position: relative;
+}
+
+.rbc-today::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: var(--google-blue);
+  border-radius: 2px;
+}
