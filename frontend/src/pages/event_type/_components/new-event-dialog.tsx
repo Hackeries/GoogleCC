@@ -44,10 +44,13 @@ const NewEventDialog = ({ btnVariant }: { btnVariant?: string }) => {
   const [appConnected, setAppConnected] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  // ✅ Fetch all integrations to check connection status
+  // ✅ Fetch all integrations to check connection status with real-time polling
   const { data: integrationsData } = useQuery({
     queryKey: ["integrations"],
     queryFn: getAllIntegrationQueryFn,
+    refetchInterval: 3000, // Poll every 3 seconds for real-time sync
+    refetchIntervalInBackground: false, // Only poll when tab is active
+    enabled: isOpen, // Only fetch when dialog is open
   });
 
   // ✅ Schema
@@ -77,15 +80,24 @@ const NewEventDialog = ({ btnVariant }: { btnVariant?: string }) => {
 
   const { isValid } = form.formState;
 
-  // ✅ Check if Google Meet is connected when integrations data loads or dialog opens
+  // ✅ Real-time sync: Update connection status when integrations data changes
   useEffect(() => {
-    if (isOpen && integrationsData?.data?.integrations) {
-      const googleMeetIntegration = integrationsData.data.integrations.find(
-        (integration) => integration.appType === "GOOGLE_MEET_AND_CALENDAR"
+    if (isOpen && integrationsData?.integrations) {
+      const googleMeetIntegration = integrationsData.integrations.find(
+        (integration) => integration.app_type === "GOOGLE_MEET_AND_CALENDAR"
       );
-      if (googleMeetIntegration?.isConnected && selectedLocationType === VideoConferencingPlatform.GOOGLE_MEET_AND_CALENDAR) {
-        setAppConnected(true);
-        setError(null);
+      
+      // Auto-update connection status in real-time
+      if (selectedLocationType === VideoConferencingPlatform.GOOGLE_MEET_AND_CALENDAR) {
+        if (googleMeetIntegration?.isConnected) {
+          setAppConnected(true);
+          setError(null);
+        } else {
+          setAppConnected(false);
+          setError(
+            `Google Meet is not connected. <a href="${PROTECTED_ROUTES.INTEGRATIONS}" target="_blank" rel="noopener noreferrer" class="underline text-primary">Visit the integration page</a> to connect your account.`
+          );
+        }
       }
     }
   }, [integrationsData, selectedLocationType, isOpen]);
@@ -97,13 +109,14 @@ const NewEventDialog = ({ btnVariant }: { btnVariant?: string }) => {
 
     // Only check for Google Meet integration
     if (value === VideoConferencingPlatform.GOOGLE_MEET_AND_CALENDAR) {
-      // ✅ First check from the fetched integrations data (cache)
-      const googleMeetIntegration = integrationsData?.data?.integrations.find(
-        (integration) => integration.appType === "GOOGLE_MEET_AND_CALENDAR"
+      // ✅ First check from the fetched integrations data (cache) - real-time synced
+      const googleMeetIntegration = integrationsData?.integrations.find(
+        (integration) => integration.app_type === "GOOGLE_MEET_AND_CALENDAR"
       );
 
       if (googleMeetIntegration?.isConnected) {
         setAppConnected(true);
+        setError(null);
         form.trigger("locationType");
         return;
       }
@@ -111,11 +124,11 @@ const NewEventDialog = ({ btnVariant }: { btnVariant?: string }) => {
       // ✅ If not found in cache, check via API call
       setIsChecking(true);
       try {
-        const { connected } = await checkIntegrationQueryFn(
+        const { isConnected } = await checkIntegrationQueryFn(
           VideoConferencingPlatform.GOOGLE_MEET_AND_CALENDAR
         );
 
-        if (!connected) {
+        if (!isConnected) {
           setError(
             `Google Meet is not connected. <a href="${PROTECTED_ROUTES.INTEGRATIONS}" target="_blank" rel="noopener noreferrer" class="underline text-primary">Visit the integration page</a> to connect your account.`
           );
