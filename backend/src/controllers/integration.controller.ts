@@ -44,9 +44,11 @@ export const checkIntegrationController = asyncHandlerAndValidation(
       appTypeDto.appType
     );
 
+    // ? Real-time sync: return consistent response format
     return res.status(HTTPSTATUS.OK).json({
       message: "Integration checked successfully",
       isConnected,
+      connected: isConnected, // Backward compatibility
     });
   }
 );

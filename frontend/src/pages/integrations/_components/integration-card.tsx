@@ -97,6 +97,7 @@ const IntegrationCard = ({
         <div className="flex flex-col items-center gap-2">
           {isConnected ? (
             <div className="relative">
+              {/* Real-time sync indicator - pulsing glow effect */}
               <div className="absolute inset-0 bg-green-500 blur-lg opacity-30 animate-pulse"></div>
               <div
                 className="relative inline-flex items-center 
@@ -104,9 +105,15 @@ const IntegrationCard = ({
                   border-2 border-green-500
                   bg-green-50
                   text-green-700
-                  px-6 rounded-full font-bold w-[180px] shadow-md"
+                  px-6 rounded-full font-bold w-[180px] shadow-md
+                  transition-all duration-300"
               >
                 ✓ Connected
+                {/* Real-time sync badge */}
+                <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                </span>
               </div>
             </div>
           ) : (
