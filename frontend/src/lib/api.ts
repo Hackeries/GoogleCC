@@ -118,6 +118,58 @@ export const cancelMeetingMutationFn = async (
   return response.data;
 };
 
+export const rescheduleMeetingMutationFn = async (data: {
+  meetingId: string;
+  startTime: string;
+  endTime: string;
+}): Promise<{ message: string; meeting: any }> => {
+  const response = await API.put(`/meeting/reschedule/${data.meetingId}`, {
+    startTime: data.startTime,
+    endTime: data.endTime,
+  });
+  return response.data;
+};
+
+// =========================
+// 📊 ANALYTICS APIS
+// =========================
+export interface DashboardAnalyticsResponse {
+  message: string;
+  data: {
+    overview: {
+      totalEvents: number;
+      upcomingMeetings: number;
+      totalMeetings: number;
+      bookingRate: string;
+    };
+    topAttendees: Array<{
+      name: string;
+      email: string;
+      meetingCount: number;
+    }>;
+    meetingsPerDay: { [key: string]: number };
+    recentMeetings: Array<{
+      id: string;
+      title: string;
+      guestName: string;
+      guestEmail: string;
+      startTime: string;
+      endTime: string;
+      meetLink: string;
+    }>;
+    popularEvents: Array<{
+      id: string;
+      title: string;
+      bookings: number;
+    }>;
+  };
+}
+
+export const getDashboardAnalyticsQueryFn = async (): Promise<DashboardAnalyticsResponse> => {
+  const response = await API.get("/analytics/dashboard");
+  return response.data;
+};
+
 // =========================
 // 🌐 PUBLIC / EXTERNAL APIS
 // =========================

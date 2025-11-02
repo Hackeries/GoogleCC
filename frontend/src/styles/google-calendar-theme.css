@@ -1,0 +1,326 @@
+/**
+ * Google Calendar Theme
+ * Colors, shadows, and typography matching Google Calendar's design
+ */
+
+:root {
+  /* Primary Colors - Google Blue */
+  --google-blue-50: #e8f0fe;
+  --google-blue-100: #d2e3fc;
+  --google-blue-200: #aecbfa;
+  --google-blue-300: #8ab4f8;
+  --google-blue-400: #669df6;
+  --google-blue-500: #4285f4;
+  --google-blue-600: #1a73e8;
+  --google-blue-700: #1967d2;
+  --google-blue-800: #185abc;
+  --google-blue-900: #174ea6;
+
+  /* Calendar Event Colors */
+  --event-lavender: #7986cb;
+  --event-sage: #33b679;
+  --event-grape: #8e24aa;
+  --event-flamingo: #e67c73;
+  --event-banana: #f6bf26;
+  --event-tangerine: #f4511e;
+  --event-peacock: #039be5;
+  --event-graphite: #616161;
+  --event-blueberry: #3f51b5;
+  --event-basil: #0b8043;
+  --event-tomato: #d50000;
+
+  /* Neutral Colors */
+  --google-gray-50: #f8f9fa;
+  --google-gray-100: #f1f3f4;
+  --google-gray-200: #e8eaed;
+  --google-gray-300: #dadce0;
+  --google-gray-400: #bdc1c6;
+  --google-gray-500: #9aa0a6;
+  --google-gray-600: #80868b;
+  --google-gray-700: #5f6368;
+  --google-gray-800: #3c4043;
+  --google-gray-900: #202124;
+
+  /* Semantic Colors */
+  --google-red: #ea4335;
+  --google-yellow: #fbbc04;
+  --google-green: #34a853;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+  --shadow-md: 0 1px 3px 0 rgba(60, 64, 67, 0.3), 0 4px 8px 3px rgba(60, 64, 67, 0.15);
+  --shadow-lg: 0 2px 6px 2px rgba(60, 64, 67, 0.15), 0 8px 16px 6px rgba(60, 64, 67, 0.15);
+  --shadow-xl: 0 4px 8px 3px rgba(60, 64, 67, 0.15), 0 12px 24px 8px rgba(60, 64, 67, 0.15);
+
+  /* Typography */
+  --font-google-sans: 'Google Sans', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  --font-product-sans: 'Product Sans', 'Google Sans', 'Roboto', sans-serif;
+}
+
+/* Calendar Grid Styling */
+.rbc-calendar {
+  font-family: var(--font-google-sans);
+  color: var(--google-gray-900);
+}
+
+.rbc-header {
+  padding: 12px 8px;
+  font-weight: 500;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--google-gray-600);
+  border-bottom: 1px solid var(--google-gray-200);
+  background: var(--google-gray-50);
+}
+
+.rbc-today {
+  background-color: var(--google-blue-50);
+}
+
+.rbc-event {
+  background-color: var(--google-blue-600);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 12px;
+  font-weight: 500;
+  border: none;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+}
+
+.rbc-event:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.rbc-event.rbc-selected {
+  background-color: var(--google-blue-700);
+  box-shadow: var(--shadow-lg);
+}
+
+.rbc-slot-selection {
+  background-color: var(--google-blue-100);
+  border: 2px solid var(--google-blue-600);
+  border-radius: 4px;
+}
+
+.rbc-day-slot .rbc-time-slot {
+  border-top: 1px solid var(--google-gray-100);
+}
+
+.rbc-time-content {
+  border-top: 1px solid var(--google-gray-200);
+}
+
+.rbc-current-time-indicator {
+  background-color: var(--google-red);
+  height: 2px;
+}
+
+/* Button Styles */
+.btn-google-primary {
+  background-color: var(--google-blue-600);
+  color: white;
+  font-family: var(--font-google-sans);
+  font-weight: 500;
+  letter-spacing: 0.25px;
+  border-radius: 4px;
+  padding: 8px 24px;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+}
+
+.btn-google-primary:hover {
+  background-color: var(--google-blue-700);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-google-secondary {
+  background-color: white;
+  color: var(--google-blue-600);
+  border: 1px solid var(--google-gray-300);
+  font-family: var(--font-google-sans);
+  font-weight: 500;
+  border-radius: 4px;
+  padding: 8px 24px;
+  transition: all 0.2s ease;
+}
+
+.btn-google-secondary:hover {
+  background-color: var(--google-blue-50);
+  border-color: var(--google-blue-600);
+}
+
+/* Card Styles */
+.card-google {
+  background: white;
+  border-radius: 8px;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+}
+
+.card-google:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+/* Input Styles */
+.input-google {
+  font-family: var(--font-google-sans);
+  border: 1px solid var(--google-gray-300);
+  border-radius: 4px;
+  padding: 10px 12px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.input-google:focus {
+  outline: none;
+  border-color: var(--google-blue-600);
+  box-shadow: 0 0 0 3px var(--google-blue-100);
+}
+
+/* Loading Spinner */
+@keyframes google-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner-google {
+  border: 3px solid var(--google-gray-200);
+  border-top: 3px solid var(--google-blue-600);
+  border-radius: 50%;
+  animation: google-spin 0.8s linear infinite;
+}
+
+/* Animations */
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromBottom {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-slide-in-top {
+  animation: slideInFromTop 0.3s ease-out;
+}
+
+.animate-slide-in-bottom {
+  animation: slideInFromBottom 0.3s ease-out;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 768px) {
+  .rbc-header {
+    font-size: 11px;
+    padding: 8px 4px;
+  }
+
+  .rbc-event {
+    font-size: 11px;
+    padding: 1px 4px;
+  }
+
+  .card-google {
+    box-shadow: var(--shadow-sm);
+  }
+
+  .card-google:hover {
+    transform: none;
+  }
+}
+
+/* Sidebar Styles */
+.sidebar-google {
+  background: white;
+  border-right: 1px solid var(--google-gray-200);
+  box-shadow: var(--shadow-sm);
+}
+
+.sidebar-item {
+  padding: 10px 16px;
+  border-radius: 24px;
+  margin: 2px 8px;
+  font-family: var(--font-google-sans);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--google-gray-700);
+  transition: all 0.2s ease;
+}
+
+.sidebar-item:hover {
+  background-color: var(--google-gray-100);
+}
+
+.sidebar-item.active {
+  background-color: var(--google-blue-100);
+  color: var(--google-blue-700);
+}
+
+/* Dialog/Modal Styles */
+.dialog-google {
+  border-radius: 8px;
+  box-shadow: var(--shadow-xl);
+  background: white;
+}
+
+.dialog-overlay {
+  background-color: rgba(0, 0, 0, 0.32);
+  backdrop-filter: blur(2px);
+}
+
+/* Toast Notifications */
+.toast-google {
+  font-family: var(--font-google-sans);
+  border-radius: 4px;
+  box-shadow: var(--shadow-lg);
+  padding: 12px 16px;
+}
+
+.toast-success {
+  background-color: var(--google-green);
+  color: white;
+}
+
+.toast-error {
+  background-color: var(--google-red);
+  color: white;
+}
+
+.toast-info {
+  background-color: var(--google-blue-600);
+  color: white;
+}

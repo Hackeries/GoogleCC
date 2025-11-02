@@ -4,7 +4,7 @@ import { format, parse, startOfWeek, getDay } from "date-fns";
 import { enUS } from "date-fns/locale";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getUserMeetingsQueryFn, createEventMutationFn } from "@/lib/api";
+import { getUserMeetingsQueryFn, createEventMutationFn, rescheduleMeetingMutationFn } from "@/lib/api";
 import { toast } from "sonner";
 import { Loader } from "@/components/loader";
 import PageTitle from "@/components/PageTitle";
@@ -21,6 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { VideoConferencingPlatform } from "@/lib/types";
+import { useRealtimeMeetings } from "@/hooks/use-realtime-meetings";
 
 const locales = { "en-US": enUS };
 const localizer = dateFnsLocalizer({
@@ -54,6 +55,9 @@ const MyCalendar = () => {
   const [newEventTitle, setNewEventTitle] = useState("");
   const [newEventDescription, setNewEventDescription] = useState("");
 
+  // Enable real-time meeting updates
+  useRealtimeMeetings();
+
   // Fetch meetings from API
   const { data: meetingsData, isLoading } = useQuery({
     queryKey: ["user_meetings", "UPCOMING"],
@@ -73,6 +77,18 @@ const MyCalendar = () => {
     },
     onError: () => {
       toast.error("Failed to create event");
+    },
+  });
+
+  // Reschedule meeting mutation
+  const rescheduleMutation = useMutation({
+    mutationFn: rescheduleMeetingMutationFn,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user_meetings"] });
+      toast.success("Meeting rescheduled successfully!");
+    },
+    onError: () => {
+      toast.error("Failed to reschedule meeting");
     },
   });
 
@@ -101,24 +117,51 @@ const MyCalendar = () => {
   // Handle event drop (drag and drop)
   const handleEventDrop = useCallback(
     ({ event, start, end }: { event: CalendarEvent; start: Date; end: Date }) => {
-      // TODO: Add backend API endpoint for updating meeting times
-      // For now, update optimistically
+      if (!event.id) {
+        toast.error("Cannot reschedule this event");
+        return;
+      }
+
+      // Optimistically update UI
       setEvents((prev) =>
         prev.map((ev) =>
           ev.id === event.id ? { ...ev, start, end } : ev
         )
       );
-      
-      toast.info("Drag & drop update coming soon! Backend endpoint needed.");
-      
-      // Uncomment when backend supports meeting updates:
-      // updateMeetingMutation.mutate({ 
-      //   meetingId: event.id, 
-      //   startTime: start.toISOString(), 
-      //   endTime: end.toISOString() 
-      // });
+
+      // Call backend to reschedule
+      rescheduleMutation.mutate({
+        meetingId: event.id,
+        startTime: start.toISOString(),
+        endTime: end.toISOString(),
+      });
     },
-    []
+    [rescheduleMutation]
+  );
+
+  // Handle event resize
+  const handleEventResize = useCallback(
+    ({ event, start, end }: { event: CalendarEvent; start: Date; end: Date }) => {
+      if (!event.id) {
+        toast.error("Cannot resize this event");
+        return;
+      }
+
+      // Optimistically update UI
+      setEvents((prev) =>
+        prev.map((ev) =>
+          ev.id === event.id ? { ...ev, start, end } : ev
+        )
+      );
+
+      // Call backend to reschedule with new duration
+      rescheduleMutation.mutate({
+        meetingId: event.id,
+        startTime: start.toISOString(),
+        endTime: end.toISOString(),
+      });
+    },
+    [rescheduleMutation]
   );
 
   // Handle create event form submission
@@ -165,6 +208,7 @@ const MyCalendar = () => {
           selectable
           onSelectSlot={handleSelectSlot}
           onEventDrop={handleEventDrop}
+          onEventResize={handleEventResize}
           resizable
           draggableAccessor={() => true}
         />

@@ -203,6 +203,77 @@ export const cancelMeetingService = async (meetingId: string) => {
   return { success: true };
 };
 
+export const rescheduleMeetingService = async (
+  meetingId: string,
+  startTime: string,
+  endTime: string
+) => {
+  const meetingRepository = AppDataSource.getRepository(Meeting);
+  const integrationRepository = AppDataSource.getRepository(Integration);
+
+  const meeting = await meetingRepository.findOne({
+    where: { id: meetingId },
+    relations: ["event", "event.user"],
+  });
+
+  if (!meeting) throw new NotFoundException("Meeting not found");
+
+  if (meeting.status === MeetingStatus.CANCELLED) {
+    throw new BadRequestException("Cannot reschedule a cancelled meeting");
+  }
+
+  const newStartTime = new Date(startTime);
+  const newEndTime = new Date(endTime);
+
+  // Update in external calendar if integration exists
+  try {
+    const calendarIntegration = await integrationRepository.findOne({
+      where: {
+        app_type:
+          IntegrationAppTypeEnum[
+            meeting.calendarAppType as keyof typeof IntegrationAppTypeEnum
+          ],
+      },
+    });
+
+    if (calendarIntegration && meeting.calendarEventId) {
+      const { calendar, calendarType } = await getCalendarClient(
+        calendarIntegration.app_type,
+        calendarIntegration.access_token,
+        calendarIntegration.refresh_token,
+        calendarIntegration.expiry_date
+      );
+
+      switch (calendarType) {
+        case IntegrationAppTypeEnum.GOOGLE_MEET_AND_CALENDAR:
+          await calendar.events.patch({
+            calendarId: "primary",
+            eventId: meeting.calendarEventId,
+            requestBody: {
+              start: { dateTime: newStartTime.toISOString() },
+              end: { dateTime: newEndTime.toISOString() },
+            },
+          });
+          break;
+        default:
+          throw new BadRequestException(
+            `Unsupported calendar provider: ${calendarType}`
+          );
+      }
+    }
+  } catch (error) {
+    console.error("Failed to update external calendar:", error);
+    // Don't throw - still update local meeting even if calendar update fails
+  }
+
+  // Update meeting in database
+  meeting.startTime = newStartTime;
+  meeting.endTime = newEndTime;
+  await meetingRepository.save(meeting);
+
+  return meeting;
+};
+
 async function getCalendarClient(
   appType: IntegrationAppTypeEnum,
   access_token: string,
