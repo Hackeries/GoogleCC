@@ -18,11 +18,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "./ui/dropdown-menu";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "./ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 
 interface GoogleCalendarNavbarProps {
   currentDate: Date;
@@ -84,7 +80,6 @@ export function GoogleCalendarNavbar({
       case "day":
         return format(currentDate, "MMMM d, yyyy");
       case "week":
-        return format(currentDate, "MMMM yyyy");
       case "month":
         return format(currentDate, "MMMM yyyy");
       case "year":
@@ -130,14 +125,16 @@ export function GoogleCalendarNavbar({
           <button
             onClick={handlePrevious}
             className="p-1 sm:p-2 hover:bg-gray-100 rounded-full transition-colors"
-            aria-label="Previous"
+            aria-label="Previous period"
+            title="Previous period"
           >
             <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
           </button>
           <button
             onClick={handleNext}
             className="p-1 sm:p-2 hover:bg-gray-100 rounded-full transition-colors"
-            aria-label="Next"
+            aria-label="Next period"
+            title="Next period"
           >
             <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
           </button>
@@ -163,30 +160,48 @@ export function GoogleCalendarNavbar({
         </div>
 
         {/* Search Icon (mobile) */}
-        <button className="xl:hidden p-1.5 sm:p-2 hover:bg-gray-100 rounded-full">
+        <button
+          className="xl:hidden p-1.5 sm:p-2 hover:bg-gray-100 rounded-full"
+          aria-label="Search"
+          title="Search"
+        >
           <Search className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
         </button>
 
         {/* Help */}
-        <button className="hidden sm:block p-2 hover:bg-gray-100 rounded-full">
+        <button
+          className="hidden sm:block p-2 hover:bg-gray-100 rounded-full"
+          aria-label="Help"
+          title="Help"
+        >
           <HelpCircle className="w-5 h-5 text-gray-600" />
         </button>
 
         {/* Settings */}
-        <button className="hidden sm:block p-2 hover:bg-gray-100 rounded-full">
+        <button
+          className="hidden sm:block p-2 hover:bg-gray-100 rounded-full"
+          aria-label="Settings"
+          title="Settings"
+        >
           <Settings className="w-5 h-5 text-gray-600" />
         </button>
 
         {/* Apps Grid */}
         <Popover>
           <PopoverTrigger asChild>
-            <button className="hidden md:block p-2 hover:bg-gray-100 rounded-full">
+            <button
+              className="hidden md:block p-2 hover:bg-gray-100 rounded-full"
+              aria-label="Google apps"
+              title="Google apps"
+            >
               <Grid3x3 className="w-5 h-5 text-gray-600" />
             </button>
           </PopoverTrigger>
           <PopoverContent className="w-80 p-4" align="end">
             <div className="mb-3">
-              <h3 className="font-semibold text-sm text-gray-900">Google apps</h3>
+              <h3 className="font-semibold text-sm text-gray-900">
+                Google apps
+              </h3>
             </div>
             <div className="grid grid-cols-3 gap-4">
               {[
@@ -202,12 +217,18 @@ export function GoogleCalendarNavbar({
               ].map((app) => (
                 <button
                   key={app.name}
+                  title={app.name}
+                  aria-label={app.name}
                   className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-50 transition-colors"
                 >
-                  <div className={`w-12 h-12 rounded-lg ${app.color} flex items-center justify-center text-xl font-bold text-gray-700`}>
+                  <div
+                    className={`w-12 h-12 rounded-lg ${app.color} flex items-center justify-center text-xl font-bold text-gray-700`}
+                  >
                     {app.icon}
                   </div>
-                  <span className="text-xs text-gray-700 font-medium">{app.name}</span>
+                  <span className="text-xs text-gray-700 font-medium">
+                    {app.name}
+                  </span>
                 </button>
               ))}
             </div>
@@ -220,9 +241,15 @@ export function GoogleCalendarNavbar({
             <Button
               variant="outline"
               className="h-8 sm:h-9 px-2 sm:px-4 text-xs sm:text-sm rounded-md border-gray-300 hover:bg-gray-50"
+              aria-label="Change view"
+              title="Change view"
             >
-              <span className="hidden sm:inline">{viewLabels[currentView]}</span>
-              <span className="sm:hidden">{viewLabels[currentView].charAt(0)}</span>
+              <span className="hidden sm:inline">
+                {viewLabels[currentView]}
+              </span>
+              <span className="sm:hidden">
+                {viewLabels[currentView].charAt(0)}
+              </span>
               <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 ml-0.5 sm:ml-1 -rotate-90" />
             </Button>
           </DropdownMenuTrigger>

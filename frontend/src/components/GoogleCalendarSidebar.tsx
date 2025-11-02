@@ -72,9 +72,7 @@ export function GoogleCalendarSidebar({
       <div className="p-3 sm:p-4">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              className="w-full justify-start gap-3 h-14 rounded-full shadow-md hover:shadow-lg transition-all bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
-            >
+            <Button className="w-full justify-start gap-3 h-14 rounded-full shadow-md hover:shadow-lg transition-all bg-white text-gray-700 border border-gray-300 hover:bg-gray-50">
               <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center shadow-sm">
                 <Plus className="w-5 h-5 text-[#1a73e8]" />
               </div>
@@ -117,7 +115,7 @@ export function GoogleCalendarSidebar({
           <h3 className="text-sm font-semibold text-gray-900 px-2">
             My calendars
           </h3>
-          
+
           {myCalendars.map((calendar) => (
             <motion.div
               key={calendar.id}
@@ -131,7 +129,9 @@ export function GoogleCalendarSidebar({
                 onCheckedChange={() => handleCalendarToggle(calendar.id)}
                 className="border-gray-400"
                 style={{
-                  backgroundColor: calendar.visible ? calendar.color : "transparent",
+                  backgroundColor: calendar.visible
+                    ? calendar.color
+                    : "transparent",
                   borderColor: calendar.color,
                 }}
               />
@@ -146,7 +146,11 @@ export function GoogleCalendarSidebar({
         <div className="mt-6 space-y-3">
           <h3 className="text-sm font-semibold text-gray-900 px-2 flex items-center justify-between">
             <span>Other calendars</span>
-            <button className="text-gray-400 hover:text-gray-600">
+            <button
+              className="text-gray-400 hover:text-gray-600"
+              aria-label="Add new calendar"
+              title="Add new calendar"
+            >
               <Plus className="w-4 h-4" />
             </button>
           </h3>
@@ -196,9 +200,7 @@ export function GoogleCalendarSidebar({
             >
               Cancel
             </Button>
-            <Button onClick={() => setIsCreateDialogOpen(false)}>
-              Create
-            </Button>
+            <Button onClick={() => setIsCreateDialogOpen(false)}>Create</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

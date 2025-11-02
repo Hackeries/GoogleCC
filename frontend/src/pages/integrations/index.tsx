@@ -45,12 +45,12 @@ const Integrations = () => {
     <div className="flex flex-col !gap-8 p-6">
       <div className="space-y-3">
         <PageTitle
-          title="?? Integrations & Apps"
+          title="Integrations & Apps"
           subtitle="Connect your favorite apps and services to supercharge your workflow"
         />
         <div className="flex flex-col sm:flex-row gap-3">
           <p className="flex-1 text-sm text-gray-600 bg-blue-50 border border-blue-200 rounded-lg p-4">
-            ?? <span className="font-semibold">Pro Tip:</span> Connect Google Meet & Calendar to enable seamless scheduling and video conferencing
+            <span className="font-semibold">Pro Tip:</span> Connect Google Meet & Calendar to enable seamless scheduling and video conferencing
           </p>
           {/* Real-time sync indicator */}
           <div className="text-sm text-gray-600 bg-green-50 border border-green-200 rounded-lg p-4 flex items-center gap-2">

@@ -3,12 +3,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Loader } from "@/components/loader";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { connectAppIntegrationQueryFn } from "@/lib/api";
 import {
   IntegrationAppEnum,
@@ -80,20 +75,37 @@ const IntegrationCard = ({
         <div className="flex flex-col gap-5">
           {Array.isArray(logos) ? (
             <div className="flex items-center gap-4">
-              <ImageWrapper src={logos[0]} alt="Google Meet logo" className="shadow-lg" />
+              <ImageWrapper
+                src={logos[0]}
+                alt="Google Meet logo"
+                className="shadow-lg"
+              />
               <span className="mx-1 text-blue-500">
                 <PlusIcon className="w-6 h-6" />
               </span>
-              <ImageWrapper src={logos[1]} alt="Google Calendar logo" className="shadow-lg" />
+              <ImageWrapper
+                src={logos[1]}
+                alt="Google Calendar logo"
+                className="shadow-lg"
+              />
             </div>
           ) : (
-            <ImageWrapper src={logos} alt={`${title} logo`} className="shadow-lg" />
+            <ImageWrapper
+              src={logos}
+              alt={`${title} logo`}
+              className="shadow-lg"
+            />
           )}
           <div className="space-y-2">
-            <CardTitle className="text-xl font-bold text-gray-800 group-hover:text-blue-600 transition-colors">{title}</CardTitle>
-            <CardDescription className="text-base text-gray-600">{description}</CardDescription>
+            <CardTitle className="text-xl font-bold text-gray-800 group-hover:text-blue-600 transition-colors">
+              {title}
+            </CardTitle>
+            <CardDescription className="text-base text-gray-600">
+              {description}
+            </CardDescription>
           </div>
         </div>
+
         <div className="flex flex-col items-center gap-2">
           {isConnected ? (
             <div className="relative">
@@ -108,7 +120,7 @@ const IntegrationCard = ({
                   px-6 rounded-full font-bold w-[180px] shadow-md
                   transition-all duration-300"
               >
-                ✓ Connected
+                Connected
                 {/* Real-time sync badge */}
                 <span className="absolute -top-1 -right-1 flex h-3 w-3">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
@@ -134,16 +146,12 @@ const IntegrationCard = ({
             >
               {isLoading && selectedType === appType ? (
                 <span className="flex items-center gap-2">
-                  <span className="animate-spin">⏳</span>
+                  <Loader className="w-4 h-4 animate-spin text-white" />
                   <span>Connecting...</span>
                 </span>
               ) : (
                 <span className="flex items-center gap-2">
-                  {isDisabled ? (
-                    <>🔒 Not available</>
-                  ) : (
-                    <>🔗 Connect Now</>
-                  )}
+                  {isDisabled ? <>🔒 Not available</> : <>🔗 Connect Now</>}
                 </span>
               )}
             </Button>

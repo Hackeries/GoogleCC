@@ -105,7 +105,7 @@ const EventListSection = (props: { events: EventType[]; username: string }) => {
         onClose={handleCloseEditDialog}
       />
     </>
-  );}
+  );
 };
 
 export default EventListSection;
