@@ -3,8 +3,7 @@ import { HTTPSTATUS } from "../config/http.config";
 import { LoginDto, RegisterDto } from "../database/dto/auth.dto";
 import { asyncHandlerAndValidation } from "../middlewares/withValidation.middleware";
 import { loginService, registerService } from "../services/auth.service";
-
-//withValidation(RegisterDto, "body")();
+import { googleLoginService } from "../services/google.service"; // ✅ Fixed import
 
 export const registerController = asyncHandlerAndValidation(
   RegisterDto,
@@ -24,7 +23,7 @@ export const loginController = asyncHandlerAndValidation(
   "body",
   async (req: Request, res: Response, loginDto) => {
     const { user, accessToken, expiresAt } = await loginService(loginDto);
-    return res.status(HTTPSTATUS.CREATED).json({
+    return res.status(HTTPSTATUS.OK).json({
       message: "User logged in successfully",
       user,
       accessToken,
@@ -32,3 +31,16 @@ export const loginController = asyncHandlerAndValidation(
     });
   }
 );
+
+// ✅ Google login handler
+export const googleLoginController = async (req: Request, res: Response) => {
+  const { token } = req.body;
+  const { user, accessToken, expiresAt } = await googleLoginService(token);
+
+  return res.status(HTTPSTATUS.OK).json({
+    message: "Google login successful",
+    user,
+    accessToken,
+    expiresAt,
+  });
+};

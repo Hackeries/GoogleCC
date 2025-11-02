@@ -1,27 +1,31 @@
-// pages/auth/components/sign-in-form.tsx
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useMutation } from "@tanstack/react-query";
+import { useGoogleLogin, TokenResponse } from "@react-oauth/google";
+import { toast } from "sonner";
 import { Eye, EyeOff, LogIn } from "lucide-react";
-import { cn } from "@/lib/utils";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Link, useNavigate } from "react-router-dom";
-import { PROTECTED_ROUTES } from "@/routes/common/routePaths";
+import { Loader } from "@/components/loader";
+import { cn } from "@/lib/utils";
 import {
   Form,
-  FormControl,
   FormField,
   FormItem,
   FormMessage,
+  FormControl,
 } from "@/components/ui/form";
 import { useStore } from "@/store/store";
-import { useMutation } from "@tanstack/react-query";
 import { loginMutationFn } from "@/lib/api";
-import { toast } from "sonner";
-import { Loader } from "@/components/loader";
-import { useState } from "react";
+import { PROTECTED_ROUTES } from "@/routes/common/routePaths";
+
+// ✅ Import correct backend types
+import { loginType, LoginResponseType, ApiError } from "@/types/api.type";
 
 const signInSchema = z.object({
   email: z.string().email("Please enter a valid email address."),
@@ -37,7 +41,12 @@ export function SignInForm({
   const { setUser, setAccessToken, setExpiresAt } = useStore();
   const [showPassword, setShowPassword] = useState(false);
 
-  const { mutate, isPending } = useMutation({
+  // ✅ Fix types to match backend definitions
+  const { mutate, isPending } = useMutation<
+    LoginResponseType,
+    ApiError,
+    loginType
+  >({
     mutationFn: loginMutationFn,
   });
 
@@ -50,29 +59,78 @@ export function SignInForm({
     },
   });
 
+  // ✅ Email/Password Login
   const onSubmit = (values: SignInFormValues) => {
     if (isPending) return;
     mutate(values, {
       onSuccess: (data) => {
-        setUser(data.user);
+        // 🧩 Map API user type → Zustand expected user type
+        setUser({
+          id: data.user.id,
+          name: data.user.name,
+          username: data.user.username || data.user.name, // fallback for backend mismatch
+          email: data.user.email,
+          imageUrl: null,
+        });
+
+
         setAccessToken(data.accessToken);
-        setExpiresAt(data.expiresAt);
+        setExpiresAt(data.expiresAt); // already a number now
+
         toast.success("Logged in successfully 🚀");
         navigate(PROTECTED_ROUTES.CALENDAR);
       },
       onError: (error) => {
-        toast.error(error.message || "Failed to login");
+        toast.error(error.message || "Failed to login. Try again!");
       },
     });
   };
+
+  // ✅ Google OAuth Login
+  const googleLogin = useGoogleLogin({
+    flow: "implicit",
+    onSuccess: async (tokenResponse: TokenResponse) => {
+      try {
+        const googleAccessToken = tokenResponse.access_token;
+        const apiUrl = import.meta.env.VITE_API_URL;
+
+        const res = await fetch(`${apiUrl}/auth/google/callback`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token: googleAccessToken }),
+        });
+
+        if (!res.ok) throw new Error("Google login failed");
+        const data: LoginResponseType = await res.json();
+
+        setUser({
+          id: data.user.id,
+          name: data.user.name,
+          username: data.user.username || data.user.name, // fallback for backend mismatch
+          email: data.user.email,
+          imageUrl: null,
+        });
+
+        setAccessToken(data.accessToken);
+        setExpiresAt(data.expiresAt);
+
+        toast.success("Logged in with Google 🎉");
+        navigate(PROTECTED_ROUTES.CALENDAR);
+      } catch (err) {
+        console.error(err);
+        toast.error("Google login failed. Please try again.");
+      }
+    },
+    onError: () => toast.error("Google sign-in was cancelled or failed."),
+  });
 
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className={cn("space-y-5 w-full", className)}
+        className={cn("space-y-6 w-full", className)}
       >
-        {/* Email Field */}
+        {/* Email */}
         <FormField
           name="email"
           control={form.control}
@@ -92,7 +150,7 @@ export function SignInForm({
           )}
         />
 
-        {/* Password Field */}
+        {/* Password */}
         <FormField
           name="password"
           control={form.control}
@@ -114,9 +172,6 @@ export function SignInForm({
                   size="icon"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
-                  aria-label={
-                    showPassword ? "Hide password" : "Show password"
-                  }
                 >
                   {showPassword ? (
                     <EyeOff size={16} className="text-gray-500" />
@@ -138,7 +193,7 @@ export function SignInForm({
           )}
         />
 
-        {/* Submit Button */}
+        {/* Submit */}
         <Button
           disabled={isPending}
           type="submit"
@@ -159,10 +214,11 @@ export function SignInForm({
           <div className="absolute left-0 top-1/2 w-full border-t border-gray-200 z-0" />
         </div>
 
-        {/* Google Sign In */}
+        {/* Google */}
         <Button
           variant="outline"
           type="button"
+          onClick={() => googleLogin()}
           className="w-full flex gap-2 items-center justify-center hover:bg-gray-50 transition-all"
         >
           <img
@@ -170,7 +226,7 @@ export function SignInForm({
             alt="Google"
             className="w-5 h-5"
           />
-          Google
+          Continue with Google
         </Button>
       </form>
     </Form>

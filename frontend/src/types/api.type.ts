@@ -1,16 +1,12 @@
 import { IntegrationAppType, VideoConferencingPlatform } from "@/lib/types";
 
-export type loginType = { email: string; password: string };
-export type LoginResponseType = {
-  message: string;
-  user: {
-    id: string;
-    name: string;
-    username: string;
-    email: string;
-  };
-  accessToken: string;
-  expiresAt: number;
+/* ----------------------------------------
+   🧩 AUTH TYPES
+----------------------------------------- */
+
+export type loginType = {
+  email: string;
+  password: string;
 };
 
 export type registerType = {
@@ -19,17 +15,37 @@ export type registerType = {
   password: string;
 };
 
-export type CreateEventPayloadType = {
-  title: string;
-  description: string;
-  duration: number;
-  locationType: VideoConferencingPlatform;
+export interface ApiError {
+  message: string;
+  status?: number;
+}
+
+/**
+ * ✅ Unified UserType across app:
+ * Used in Zustand store, API responses, and components.
+ */
+export interface UserType {
+  id: string;
+  name: string;
+  username: string;
+  email: string;
+  imageUrl?: string | null;
+}
+
+/**
+ * ✅ Response from backend for both login & Google auth
+ */
+export type LoginResponseType = {
+  message: string;
+  user: UserType;
+  accessToken: string;
+  expiresAt: number;
 };
 
-export interface UserType {
-  name: string;
-  imageUrl: string | null;
-}
+/* ----------------------------------------
+   🗓️ EVENT TYPES
+----------------------------------------- */
+
 export interface EventType {
   id: string;
   title: string;
@@ -57,7 +73,10 @@ export interface UserEventListResponse {
   };
 }
 
-//***********Integration */
+/* ----------------------------------------
+   🔌 INTEGRATION TYPES
+----------------------------------------- */
+
 export interface IntegrationType {
   provider: "GOOGLE" | "ZOOM" | "MICROSOFT";
   title: string;
@@ -71,13 +90,17 @@ export interface GetAllIntegrationResponseType {
   integrations: IntegrationType[];
 }
 
-//************************* Availablity */
+/* ----------------------------------------
+   🕓 AVAILABILITY TYPES
+----------------------------------------- */
+
 export interface DayAvailabilityType {
   day: string;
   startTime: string;
   endTime: string;
   isAvailable: boolean;
 }
+
 export interface AvailabilityType {
   timeGap: number;
   days: DayAvailabilityType[];
@@ -88,7 +111,10 @@ export interface UserAvailabilityResponseType {
   availability: AvailabilityType;
 }
 
-//************************* Meetings */
+/* ----------------------------------------
+   📅 MEETING TYPES
+----------------------------------------- */
+
 type MeetingStatus = "SCHEDULED" | "CANCELLED" | "COMPLETED";
 
 export interface MeetingType {
@@ -105,12 +131,15 @@ export interface MeetingType {
   updatedAt: string;
   event: EventType;
 }
+
 export interface UserMeetingsResponseType {
   message: string;
   meetings: MeetingType[];
 }
 
-//************ALL PUBLIC API TYPES */
+/* ----------------------------------------
+   🌍 PUBLIC EVENT TYPES
+----------------------------------------- */
 
 export interface PublicEventResponseType {
   message: string;
@@ -123,6 +152,10 @@ export interface PublicSingleEventDetailResponseType {
   event: EventType;
 }
 
+/* ----------------------------------------
+   🕐 PUBLIC AVAILABILITY TYPES
+----------------------------------------- */
+
 export type DayOfWeekType =
   | "SUNDAY"
   | "MONDAY"
@@ -132,10 +165,10 @@ export type DayOfWeekType =
   | "FRIDAY"
   | "SATURDAY";
 
-interface AvailabilitySlotType {
+export interface AvailabilitySlotType {
   day: DayOfWeekType;
-  dateStr: string; // ISO date string (e.g., "2025-03-08")
-  slots: string[]; // Array of time slots (e.g., ["10:00", "10:30"])
+  dateStr: string; // ISO date string (e.g. "2025-03-08")
+  slots: string[]; // e.g. ["10:00", "10:30"]
   isAvailable: boolean;
 }
 
@@ -143,6 +176,10 @@ export interface PublicAvailabilityEventResponseType {
   message: string;
   data: AvailabilitySlotType[];
 }
+
+/* ----------------------------------------
+   📞 CREATE MEETING
+----------------------------------------- */
 
 export interface CreateMeetingType {
   eventId: string;
@@ -153,4 +190,19 @@ export interface CreateMeetingType {
   additionalInfo?: string;
 }
 
+/* ----------------------------------------
+   ⏳ PERIOD TYPE
+----------------------------------------- */
+
 export type PeriodType = "UPCOMING" | "PAST" | "CANCELLED";
+
+/* ----------------------------------------
+   ✅ CREATE EVENT PAYLOAD
+----------------------------------------- */
+
+export type CreateEventPayloadType = {
+  title: string;
+  description: string;
+  duration: number;
+  locationType: VideoConferencingPlatform;
+};

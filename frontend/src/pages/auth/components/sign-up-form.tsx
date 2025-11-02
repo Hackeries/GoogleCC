@@ -1,4 +1,3 @@
-// pages/auth/components/sign-up-form.tsx
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,8 +20,12 @@ import { useMutation } from "@tanstack/react-query";
 import { registerMutationFn } from "@/lib/api";
 import { toast } from "sonner";
 import { Loader } from "@/components/loader";
+import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
+import { LoginResponseType } from "@/types/api.type";
 
-// ✅ Validation schema
+// -------------------------
+// 🧩 Validation Schema
+// -------------------------
 const signUpSchema = z.object({
   name: z.string().min(1, "Full name is required"),
   email: z.string().email("Please enter a valid email address"),
@@ -31,13 +34,21 @@ const signUpSchema = z.object({
 
 type SignUpFormValues = z.infer<typeof signUpSchema>;
 
+// -------------------------
+// 🧠 Component
+// -------------------------
 export function SignUpForm({
   className,
 }: React.ComponentPropsWithoutRef<"div">) {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
 
-  const { mutate, isPending } = useMutation({
+  // ✅ Strict typing for mutation
+  const { mutate, isPending } = useMutation<
+    LoginResponseType,
+    Error,
+    SignUpFormValues
+  >({
     mutationFn: registerMutationFn,
   });
 
@@ -51,6 +62,7 @@ export function SignUpForm({
     },
   });
 
+  // ✅ Email/Password Signup
   const onSubmit = (values: SignUpFormValues) => {
     if (isPending) return;
     mutate(values, {
@@ -58,10 +70,37 @@ export function SignUpForm({
         toast.success("🎉 Account created successfully!");
         navigate(AUTH_ROUTES.SIGN_IN);
       },
-      onError: (error) => {
+      onError: (error: Error) => {
         toast.error(error.message || "Failed to register");
       },
     });
+  };
+
+  // ✅ Google OAuth Signup
+  const handleGoogleSignup = async (credentialResponse: CredentialResponse) => {
+    const credential = credentialResponse?.credential;
+    if (!credential) {
+      toast.error("Google signup failed — no credentials received.");
+      return;
+    }
+
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/google`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: credential }),
+      });
+
+      const data: LoginResponseType = await res.json();
+      if (!res.ok) throw new Error(data?.message || "Google signup failed");
+
+      toast.success("Signed up with Google 🎉");
+      navigate(AUTH_ROUTES.SIGN_IN);
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Google signup failed";
+      toast.error(message);
+    }
   };
 
   return (
@@ -131,11 +170,9 @@ export function SignUpForm({
                   type="button"
                   variant="ghost"
                   size="icon"
-                  onClick={() => setShowPassword(!showPassword)}
+                  onClick={() => setShowPassword((prev) => !prev)}
                   className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
-                  aria-label={
-                    showPassword ? "Hide password" : "Show password"
-                  }
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? (
                     <EyeOff size={16} className="text-gray-500" />
@@ -171,18 +208,15 @@ export function SignUpForm({
         </div>
 
         {/* Google OAuth */}
-        <Button
-          variant="outline"
-          type="button"
-          className="w-full flex gap-2 items-center justify-center hover:bg-gray-50 transition-all"
-        >
-          <img
-            src="https://www.svgrepo.com/show/475656/google-color.svg"
-            alt="Google"
-            className="w-5 h-5"
+        <div className="flex justify-center">
+          <GoogleLogin
+            onSuccess={handleGoogleSignup}
+            onError={() => toast.error("Google sign-up failed")}
+            shape="rectangular"
+            size="large"
+            theme="outline"
           />
-          Google
-        </Button>
+        </div>
       </form>
     </Form>
   );

@@ -3,12 +3,13 @@
 import { useStore } from "@/store/store";
 import { useCallback } from "react";
 import { toast } from "sonner";
+import type { AuthState } from "@/store/store";
 
 export const useAppState = () => {
   const store = useStore();
 
   const setUser = useCallback(
-    (user: any) => {
+    (user: AuthState["user"]) => {
       store.setUser(user);
     },
     [store]
@@ -29,7 +30,7 @@ export const useAppState = () => {
     window.location.href = "/";
   }, [store]);
 
-  const hasActiveSession = useCallback(() => {
+  const hasActiveSession = useCallback((): boolean => {
     const token = store.accessToken;
     const expiresAt = store.expiresAt;
 

@@ -6,13 +6,19 @@ import createSelectors from "./selectors";
 // -------------------------
 // 🧠 Types
 // -------------------------
-type UserType = {
+// -------------------------
+// 🧠 Types
+// -------------------------
+export type UserType = {
+  id: string; // ✅ added
   name: string;
   username: string;
   email: string;
+  imageUrl?: string | null; // ✅ added (optional, since you use null)
 };
 
-type AuthState = {
+
+export type AuthState = {
   user: UserType | null;
   accessToken: string | null;
   expiresAt: number | null;

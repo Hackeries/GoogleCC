@@ -9,18 +9,22 @@ import App from "./App";
 import "./index.css";
 import "./styles/google-calendar-theme.css";
 import "./styles/google-calendar.css";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
+const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID as string;
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <ThemeProvider>
-      <QueryProvider>
-        <BrowserRouter>
-          <NuqsAdapter>
-            <App />
-          </NuqsAdapter>
-        </BrowserRouter>
-        <Toaster />
-      </QueryProvider>
-    </ThemeProvider>
+    <GoogleOAuthProvider clientId={googleClientId}>
+      <ThemeProvider>
+        <QueryProvider>
+          <BrowserRouter>
+            <NuqsAdapter>
+              <App />
+            </NuqsAdapter>
+            <Toaster />
+          </BrowserRouter>
+        </QueryProvider>
+      </ThemeProvider>
+    </GoogleOAuthProvider>
   </StrictMode>
 );

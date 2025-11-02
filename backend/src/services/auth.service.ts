@@ -30,25 +30,27 @@ export const registerService = async (registerDto: RegisterDto) => {
 
   const username = await generateUsername(registerDto.name);
   const user = userRepository.create({
-    ...registerDto,
+    email: registerDto.email,
+    name: registerDto.name,
+    password: registerDto.password,
     username,
+    imageUrl: registerDto.imageUrl || undefined, // ✅ fixed: no null
   });
 
   const availability = availabilityRepository.create({
     timeGap: 30,
-    days: Object.values(DayOfWeekEnum).map((day) => {
-      return dayAvailabilityRepository.create({
-        day: day,
-        startTime: new Date(`2025-03-01T09:00:00Z`), //9:00
-        endTime: new Date(`2025-03-01T17:00:00Z`), //5:00pm
+    days: Object.values(DayOfWeekEnum).map((day) =>
+      dayAvailabilityRepository.create({
+        day,
+        startTime: new Date(`2025-03-01T09:00:00Z`),
+        endTime: new Date(`2025-03-01T17:00:00Z`),
         isAvailable:
           day !== DayOfWeekEnum.SUNDAY && day !== DayOfWeekEnum.SATURDAY,
-      });
-    }),
+      })
+    ),
   });
 
   user.availability = availability;
-
   await userRepository.save(user);
 
   return { user: user.omitPassword() };
@@ -61,14 +63,11 @@ export const loginService = async (loginDto: LoginDto) => {
     where: { email: loginDto.email },
   });
 
-  if (!user) {
-    throw new NotFoundException("User not found");
-  }
+  if (!user) throw new NotFoundException("User not found");
 
   const isPasswordValid = await user.comparePassword(loginDto.password);
-  if (!isPasswordValid) {
-    throw new UnauthorizedException("Invalid email/password");
-  }
+  if (!isPasswordValid)
+    throw new UnauthorizedException("Invalid email or password");
 
   const { token, expiresAt } = signJwtToken({ userId: user.id });
 
@@ -81,21 +80,17 @@ export const loginService = async (loginDto: LoginDto) => {
 
 async function generateUsername(name: string): Promise<string> {
   const cleanName = name.replace(/\s+/g, "").toLowerCase();
-  const baseUsername = cleanName;
-
-  const uuidSuffix = uuidv4().replace(/\s+/g, "").slice(0, 4);
+  const uuidSuffix = uuidv4().slice(0, 4);
+  const baseUsername = `${cleanName}${uuidSuffix}`;
   const userRepository = AppDataSource.getRepository(User);
 
-  let username = `${baseUsername}${uuidSuffix}`;
-  let existingUser = await userRepository.findOne({
-    where: { username },
-  });
-
-  while (existingUser) {
-    username = `${baseUsername}${uuidv4().replace(/\s+/g, "").slice(0, 4)}`;
-    existingUser = await userRepository.findOne({
+  let username = baseUsername;
+  while (
+    await userRepository.findOne({
       where: { username },
-    });
+    })
+  ) {
+    username = `${cleanName}${uuidv4().slice(0, 4)}`;
   }
 
   return username;

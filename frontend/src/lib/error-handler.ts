@@ -1,39 +1,49 @@
 import { toast } from "sonner";
+import type { AxiosError } from "axios";
 
 export interface AppError {
   message: string;
   code?: string;
   status?: number;
-  details?: any;
+  details?: unknown;
 }
 
 /**
- * Handle API errors consistently across the app
- * Centralized error handling with proper logging
+ * 🔧 Handle API errors consistently across the app
  */
 export const handleApiError = (
-  error: any,
+  error: unknown,
   defaultMessage = "An error occurred"
 ): AppError => {
-  console.error("[v0] API Error:", error);
+  console.error("[App] API Error:", error);
 
-  // Axios error
-  if (error?.response) {
-    const status = error.response.status;
-    const data = error.response.data;
+  // ✅ Axios error
+  if (isAxiosError(error)) {
+    const status = error.response?.status;
+    const data = error.response?.data as Record<string, unknown> | undefined;
 
-    const message = data?.message || data?.error || defaultMessage;
+    const message =
+      (data?.message as string) || (data?.error as string) || defaultMessage;
+
+    // ✅ Properly typed and const-safe
+    const rawErrorCode = data?.errorCode;
+    const code: string =
+      typeof rawErrorCode === "number"
+        ? `ERR_${rawErrorCode}`
+        : typeof rawErrorCode === "string"
+        ? rawErrorCode
+        : `HTTP_${String(status ?? 500)}`;
 
     return {
       message,
-      code: data?.errorCode || `HTTP_${status}`,
+      code,
       status,
       details: data,
     };
   }
 
-  // Network error
-  if (error?.message?.includes("Network")) {
+  // 🌐 Network error
+  if (error instanceof Error && error.message.includes("Network")) {
     return {
       message: "Network error. Please check your connection.",
       code: "NETWORK_ERROR",
@@ -41,8 +51,12 @@ export const handleApiError = (
     };
   }
 
-  // Timeout error
-  if (error?.code === "ECONNABORTED") {
+  // ⏱ Timeout error
+  if (
+    error instanceof Error &&
+    "code" in error &&
+    (error as { code: string }).code === "ECONNABORTED"
+  ) {
     return {
       message: "Request timeout. Please try again.",
       code: "TIMEOUT_ERROR",
@@ -50,59 +64,78 @@ export const handleApiError = (
     };
   }
 
-  // Unknown error
+  // 💥 Generic JS error
+  if (error instanceof Error) {
+    return {
+      message: error.message || defaultMessage,
+      code: "JS_ERROR",
+      details: error,
+    };
+  }
+
+  // 🧩 Fallback
   return {
-    message: error?.message || defaultMessage,
+    message: defaultMessage,
     code: "UNKNOWN_ERROR",
     details: error,
   };
 };
 
 /**
- * Show error toast with consistent formatting
+ * Type guard for Axios errors
+ */
+function isAxiosError(error: unknown): error is AxiosError {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "isAxiosError" in error &&
+    (error as AxiosError).isAxiosError === true
+  );
+}
+
+/**
+ * 🚨 Show error toast
  */
 export const showErrorToast = (
-  error: any,
+  error: unknown,
   defaultMessage = "Something went wrong"
-) => {
+): AppError => {
   const appError = handleApiError(error, defaultMessage);
   toast.error(appError.message, {
     description:
-      appError.code !== "HTTP_500" ? undefined : "Our team has been notified",
+      appError.code === "HTTP_500" ? "Our team has been notified" : undefined,
     duration: 5000,
   });
   return appError;
 };
 
 /**
- * Show success toast with consistent formatting
+ * ✅ Show success toast
  */
-export const showSuccessToast = (message: string, description?: string) => {
-  toast.success(message, {
-    description,
-    duration: 3000,
-  });
+export const showSuccessToast = (
+  message: string,
+  description?: string
+): void => {
+  toast.success(message, { description, duration: 3000 });
 };
 
 /**
- * Show loading toast (for long operations)
+ * ⏳ Show loading toast
  */
-export const showLoadingToast = (message: string) => {
-  return toast.loading(message);
+export const showLoadingToast = (message: string): string => {
+  return String(toast.loading(message));
 };
 
 /**
- * Validate required fields
+ * 🧩 Validate required fields
  */
 export const validateRequired = (
-  fields: Record<string, any>,
+  fields: Record<string, unknown>,
   fieldNames: string[]
 ): string | null => {
   for (const fieldName of fieldNames) {
-    if (
-      !fields[fieldName] ||
-      (typeof fields[fieldName] === "string" && fields[fieldName].trim() === "")
-    ) {
+    const value = fields[fieldName];
+    if (value == null || (typeof value === "string" && value.trim() === "")) {
       return `${fieldName} is required`;
     }
   }
@@ -110,7 +143,7 @@ export const validateRequired = (
 };
 
 /**
- * Validate email format
+ * 📧 Validate email format
  */
 export const validateEmail = (email: string): boolean => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -118,13 +151,13 @@ export const validateEmail = (email: string): boolean => {
 };
 
 /**
- * Safe JSON parse
+ * 🧠 Safe JSON parse
  */
-export const safeJsonParse = (json: string, fallback: any = null): any => {
+export const safeJsonParse = <T>(json: string, fallback: T): T => {
   try {
-    return JSON.parse(json);
+    return JSON.parse(json) as T;
   } catch (error) {
-    console.error("[v0] JSON parse error:", error);
+    console.error("[App] JSON parse error:", error);
     return fallback;
   }
 };

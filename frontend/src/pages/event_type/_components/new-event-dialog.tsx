@@ -165,7 +165,7 @@ const NewEventDialog = ({ btnVariant }: { btnVariant?: string }) => {
     console.log("✅ Form Data (payload):", payload);
 
     mutate(payload, {
-      onSuccess: (response) => {
+      onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["event_list"] });
         queryClient.invalidateQueries({ queryKey: ["integrations"] });
         setSelectedLocationType(null);
@@ -173,19 +173,20 @@ const NewEventDialog = ({ btnVariant }: { btnVariant?: string }) => {
         setAppConnected(false);
         setError(null);
         form.reset();
-        
-        // ✨ Professional success notification with details
+
         toast.success("🎉 Event Created Successfully!", {
           description: `"${data.title}" is now ready for bookings!`,
           duration: 5000,
         });
       },
-      onError: (error: any) => {
+      onError: (error: unknown) => {
+        const err = error as { response?: { data?: { message?: string } } };
         toast.error("Failed to create event", {
-          description: error?.response?.data?.message || "Please try again later",
+          description: err.response?.data?.message || "Please try again later",
         });
       },
     });
+
   };
 
   return (
