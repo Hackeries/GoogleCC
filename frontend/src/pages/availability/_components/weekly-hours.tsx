@@ -4,6 +4,7 @@ import { dayMapping } from "@/lib/availability";
 
 type WeekPreviewGridProps = {
   days: DayAvailabilityType[];
+  timeGap?: number;
   timezone?: string;
 };
 

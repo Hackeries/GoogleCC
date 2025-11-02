@@ -5,20 +5,25 @@ type RouteMap = Record<string, string>;
 export const AUTH_ROUTES: RouteMap = {
   SIGN_IN: "/",
   SIGN_UP: "/sign-up",
-};
+} as const;
 
 export const PROTECTED_ROUTES: RouteMap = {
+  DASHBOARD: "/app/dashboard",
   EVENT_TYPES: "/app/event_types",
-  INTEGRATIONS: "/app/integrations",
-  AVAILABILITY: "/app/availability/schedules",
   MEETINGS: "/app/scheduled_events",
-  CALENDAR: "/app/calendar", // ✅ added calendar route
-};
+  AVAILABILITY: "/app/availability/schedules",
+  CALENDAR: "/app/calendar",
+  INTEGRATIONS: "/app/integrations",
+  ANALYTICS: "/app/analytics",
+  TEAM: "/app/team",
+  SETTINGS: "/app/settings",
+  HELP: "/app/help",
+} as const;
 
 export const PUBLIC_ROUTES: RouteMap = {
   USER_EVENTS: "/:username",
   USER_SINGLE_EVENT: "/:username/:slug",
-};
+} as const;
 
 export const isAuthRoute = (pathname: string): boolean => {
   const cleanPath = pathname.split("?")[0];
