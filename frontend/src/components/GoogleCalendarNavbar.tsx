@@ -105,13 +105,13 @@ export function GoogleCalendarNavbar({
   };
 
   return (
-    <nav className="h-16 bg-white border-b border-gray-200 px-4 flex items-center justify-between">
+    <nav className="h-14 sm:h-16 bg-white border-b border-gray-200 px-2 sm:px-4 flex items-center justify-between flex-shrink-0">
       {/* Left Section */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-1 sm:gap-2 md:gap-4 flex-1 min-w-0">
         {/* Logo */}
-        <div className="flex items-center gap-3">
-          <Calendar className="w-6 h-6 text-[#1a73e8]" />
-          <h1 className="text-xl font-normal text-gray-700 hidden md:block">
+        <div className="flex items-center gap-2">
+          <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-[#1a73e8] flex-shrink-0" />
+          <h1 className="text-base sm:text-xl font-normal text-gray-700 hidden sm:block">
             Calendar
           </h1>
         </div>
@@ -120,7 +120,7 @@ export function GoogleCalendarNavbar({
         <Button
           variant="outline"
           onClick={onTodayClick}
-          className="h-9 px-4 rounded-md border-gray-300 hover:bg-gray-50"
+          className="h-8 sm:h-9 px-2 sm:px-4 text-xs sm:text-sm rounded-md border-gray-300 hover:bg-gray-50"
         >
           Today
         </Button>
@@ -129,58 +129,58 @@ export function GoogleCalendarNavbar({
         <div className="flex items-center">
           <button
             onClick={handlePrevious}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-1 sm:p-2 hover:bg-gray-100 rounded-full transition-colors"
             aria-label="Previous"
           >
-            <ChevronLeft className="w-5 h-5 text-gray-600" />
+            <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
           </button>
           <button
             onClick={handleNext}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-1 sm:p-2 hover:bg-gray-100 rounded-full transition-colors"
             aria-label="Next"
           >
-            <ChevronRight className="w-5 h-5 text-gray-600" />
+            <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
           </button>
         </div>
 
         {/* Current Date Display */}
-        <h2 className="text-xl font-normal text-gray-700 min-w-[200px]">
+        <h2 className="text-sm sm:text-xl font-normal text-gray-700 truncate min-w-0">
           {getDateTitle()}
         </h2>
       </div>
 
       {/* Right Section */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1 sm:gap-2">
         {/* Search */}
-        <div className="hidden lg:block relative">
+        <div className="hidden xl:block relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search"
-            className="pl-9 w-64 h-9 rounded-full border-gray-300 bg-gray-50 focus:bg-white"
+            className="pl-9 w-48 lg:w-64 h-9 rounded-full border-gray-300 bg-gray-50 focus:bg-white"
           />
         </div>
 
         {/* Search Icon (mobile) */}
-        <button className="lg:hidden p-2 hover:bg-gray-100 rounded-full">
-          <Search className="w-5 h-5 text-gray-600" />
+        <button className="xl:hidden p-1.5 sm:p-2 hover:bg-gray-100 rounded-full">
+          <Search className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
         </button>
 
         {/* Help */}
-        <button className="p-2 hover:bg-gray-100 rounded-full">
+        <button className="hidden sm:block p-2 hover:bg-gray-100 rounded-full">
           <HelpCircle className="w-5 h-5 text-gray-600" />
         </button>
 
         {/* Settings */}
-        <button className="p-2 hover:bg-gray-100 rounded-full">
+        <button className="hidden sm:block p-2 hover:bg-gray-100 rounded-full">
           <Settings className="w-5 h-5 text-gray-600" />
         </button>
 
         {/* Apps Grid */}
         <Popover>
           <PopoverTrigger asChild>
-            <button className="p-2 hover:bg-gray-100 rounded-full">
+            <button className="hidden md:block p-2 hover:bg-gray-100 rounded-full">
               <Grid3x3 className="w-5 h-5 text-gray-600" />
             </button>
           </PopoverTrigger>
@@ -219,10 +219,11 @@ export function GoogleCalendarNavbar({
           <DropdownMenuTrigger asChild>
             <Button
               variant="outline"
-              className="h-9 px-4 rounded-md border-gray-300 hover:bg-gray-50"
+              className="h-8 sm:h-9 px-2 sm:px-4 text-xs sm:text-sm rounded-md border-gray-300 hover:bg-gray-50"
             >
-              {viewLabels[currentView]}
-              <ChevronRight className="w-4 h-4 ml-1 -rotate-90" />
+              <span className="hidden sm:inline">{viewLabels[currentView]}</span>
+              <span className="sm:hidden">{viewLabels[currentView].charAt(0)}</span>
+              <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 ml-0.5 sm:ml-1 -rotate-90" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-32">

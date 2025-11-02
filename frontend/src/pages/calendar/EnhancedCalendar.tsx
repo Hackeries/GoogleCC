@@ -256,8 +256,10 @@ const EnhancedCalendar = () => {
 
   if (isLoading) {
     return (
-      <div className="flex h-[calc(100vh-80px)]">
-        <GoogleCalendarSidebar />
+      <div className="flex flex-col md:flex-row h-screen w-full bg-white dark:bg-gray-900 overflow-hidden">
+        <aside className="hidden md:block md:w-64 lg:w-72 border-r border-gray-200">
+          <GoogleCalendarSidebar />
+        </aside>
         <div className="flex-1 flex items-center justify-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1a73e8]"></div>
         </div>
@@ -266,17 +268,19 @@ const EnhancedCalendar = () => {
   }
 
   return (
-    <div className="flex h-[calc(100vh-80px)] bg-white dark:bg-gray-900">
+    <div className="flex flex-col md:flex-row h-screen w-full bg-white dark:bg-gray-900 overflow-hidden">
       {/* Sidebar */}
-      <GoogleCalendarSidebar
-        onCreateEvent={(type) => {
-          toast.info(`Creating ${type}...`);
-          setIsDialogOpen(true);
-        }}
-      />
+      <aside className="hidden md:block md:w-64 lg:w-72 border-r border-gray-200 dark:border-gray-700 overflow-y-auto">
+        <GoogleCalendarSidebar
+          onCreateEvent={(type) => {
+            toast.info(`Creating ${type}...`);
+            setIsDialogOpen(true);
+          }}
+        />
+      </aside>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden min-w-0">
         {/* Navbar */}
         <GoogleCalendarNavbar
           currentDate={currentDate}
@@ -287,7 +291,7 @@ const EnhancedCalendar = () => {
         />
 
         {/* Calendar Content */}
-        <div className="flex-1 overflow-auto p-4">
+        <div className="flex-1 overflow-auto p-2 sm:p-4">
           <AnimatePresence mode="wait">
             {currentView === "year" ? (
               <motion.div
@@ -373,14 +377,14 @@ const EnhancedCalendar = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.2 }}
-                className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm h-full"
+                className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm h-[calc(100vh-120px)] sm:h-[calc(100vh-140px)] min-h-[500px]"
               >
                 <Calendar
                   localizer={localizer}
                   events={events}
                   startAccessor="start"
                   endAccessor="end"
-                  style={{ height: "100%" }}
+                  style={{ height: "100%", minHeight: "500px" }}
                   view={currentView as "month" | "week" | "day"}
                   onView={() => {}} // Controlled by our custom view selector
                   date={currentDate}
