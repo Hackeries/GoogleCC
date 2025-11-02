@@ -13,6 +13,7 @@ export const PROTECTED_ROUTES: RouteMap = {
   MEETINGS: "/app/scheduled_events",
   AVAILABILITY: "/app/availability/schedules",
   CALENDAR: "/app/calendar",
+  ENHANCED_CALENDAR: "/app/google-calendar",
   INTEGRATIONS: "/app/integrations",
   ANALYTICS: "/app/analytics",
   TEAM: "/app/team",

@@ -76,6 +76,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       url: PROTECTED_ROUTES.CALENDAR,
       icon: CalendarCheck,
       section: "Events",
+    },
+    {
+      title: "Google Calendar",
+      url: "/app/google-calendar",
+      icon: CalendarRange,
+      section: "Events",
       separator: true,
     },
 
