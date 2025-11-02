@@ -22,7 +22,7 @@ const SignIn = () => {
           </motion.div>
 
           <h1 className="text-2xl font-bold text-[#0a2540] text-center">
-            Welcome back to GCC
+            Welcome back to Google Cal 1.1
           </h1>
           <p className="text-sm text-gray-500 text-center">
             Sign in to manage your calendar and meetings

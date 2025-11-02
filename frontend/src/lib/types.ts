@@ -33,8 +33,8 @@ export type IntegrationTitleType =
 /** Short descriptions for integrations */
 export const IntegrationDescriptions: Record<IntegrationAppType, string> = {
   GOOGLE_MEET_AND_CALENDAR:
-    "Include Google Meet details in your Meetly events and sync with Google Calendar.",
-  ZOOM_MEETING: "Include Zoom details in your Meetly events.",
+    "Include Google Meet details in your events and sync with Google Calendar.",
+  ZOOM_MEETING: "Include Zoom details in your events.",
   MICROSOFT_TEAMS:
     "Microsoft Teams integration for video conferencing and collaboration.",
   OUTLOOK_CALENDAR:

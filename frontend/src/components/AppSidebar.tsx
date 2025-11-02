@@ -6,12 +6,9 @@ import {
   LinkIcon,
   LucideIcon,
   Settings,
-  BarChart3,
-  Users2,
   HelpCircle,
   LogOut,
   Home,
-  CalendarCheck,
 } from "lucide-react";
 
 import {
@@ -72,12 +69,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       section: "Events",
     },
     {
-      title: "My Calendar",
-      url: PROTECTED_ROUTES.CALENDAR,
-      icon: CalendarCheck,
-      section: "Events",
-    },
-    {
       title: "Google Calendar",
       url: "/app/google-calendar",
       icon: CalendarRange,
@@ -90,18 +81,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       title: "Integrations & Apps",
       url: PROTECTED_ROUTES.INTEGRATIONS,
       icon: LayoutGrid,
-      section: "Integrations",
-    },
-    {
-      title: "Analytics",
-      url: "/app/analytics",
-      icon: BarChart3,
-      section: "Integrations",
-    },
-    {
-      title: "Team Members",
-      url: "/app/team",
-      icon: Users2,
       section: "Integrations",
       separator: true,
     },
