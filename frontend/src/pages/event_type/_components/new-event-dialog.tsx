@@ -175,20 +175,21 @@ const NewEventDialog = ({ btnVariant }: { btnVariant?: string }) => {
           variant={btnVariant ? "default" : "outline"}
           size="lg"
           className={cn(
-            `!w-auto !border-[#476788] !text-[#0a2540] !font-normal !text-sm`,
-            btnVariant && "!text-white !border-primary"
+            `!w-auto !border-2 !border-blue-500 !text-blue-600 !font-semibold !text-base hover:bg-blue-50 transition-all duration-300 shadow-md hover:shadow-xl`,
+            btnVariant && "!text-white !bg-gradient-to-r !from-blue-500 !to-purple-600 hover:!from-blue-600 hover:!to-purple-700 !border-none"
           )}
         >
-          <PlusIcon className="w-4 h-4" />
+          <PlusIcon className="w-5 h-5" />
           <span>New Event Type</span>
         </Button>
+
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto !px-0 pb-0">
-        <DialogHeader className="px-6">
-          <DialogTitle className="text-xl">Add a new event type</DialogTitle>
-          <DialogDescription>
-            Create a new event type for people to book times with.
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto !px-0 pb-0">
+        <DialogHeader className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-6">
+          <DialogTitle className="text-2xl font-bold">✨ Create Event Type</DialogTitle>
+          <DialogDescription className="text-blue-100 text-base">
+            Set up a new event type for seamless scheduling
           </DialogDescription>
         </DialogHeader>
 
@@ -201,11 +202,15 @@ const NewEventDialog = ({ btnVariant }: { btnVariant?: string }) => {
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <Label className="font-semibold !text-base">
-                      Event name
+                    <Label className="font-semibold !text-base text-gray-700">
+                      📝 Event name *
                     </Label>
                     <FormControl className="mt-2">
-                      <Input placeholder="Name your event" {...field} />
+                      <Input 
+                        placeholder="e.g., 30-Minute Consultation, Discovery Call" 
+                        className="h-12 text-base border-2 focus:border-blue-500 transition-colors"
+                        {...field} 
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -218,13 +223,14 @@ const NewEventDialog = ({ btnVariant }: { btnVariant?: string }) => {
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <Label className="font-semibold !text-base">
-                      Description
+                    <Label className="font-semibold !text-base text-gray-700">
+                      💬 Description
                     </Label>
                     <FormControl className="mt-2">
                       <Textarea
-                        className="focus-visible:ring-ring/0"
-                        placeholder="Description"
+                        className="focus-visible:ring-ring/0 border-2 focus:border-blue-500 transition-colors text-base resize-none"
+                        placeholder="Describe what this event is about..."
+                        rows={3}
                         {...field}
                       />
                     </FormControl>
@@ -239,12 +245,13 @@ const NewEventDialog = ({ btnVariant }: { btnVariant?: string }) => {
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <Label className="font-semibold !text-base">Duration</Label>
+                    <Label className="font-semibold !text-base text-gray-700">⏱️ Duration (minutes) *</Label>
                     <FormControl className="mt-2">
                       <Input
                         {...field}
                         type="number"
-                        placeholder="Duration (in minutes)"
+                        placeholder="e.g., 15, 30, 60"
+                        className="h-12 text-base border-2 focus:border-blue-500 transition-colors"
                         onChange={(e) => {
                           const value = parseInt(e.target.value, 10);
                           if (!isNaN(value) && value > 0) {
@@ -264,28 +271,28 @@ const NewEventDialog = ({ btnVariant }: { btnVariant?: string }) => {
                 control={form.control}
                 render={() => (
                   <FormItem>
-                    <Label className="font-semibold !text-base">
-                      Location Type
+                    <Label className="font-semibold !text-base text-gray-700">
+                      🔗 Meeting Platform *
                     </Label>
                     <FormControl className="w-full mt-2">
-                      <div className="grid grid-cols-4 gap-2">
+                      <div className="grid grid-cols-4 gap-3">
                         {locationOptions.map((option) => (
                           <button
                             key={option.value}
                             type="button"
                             title={option.label} // ✅ accessibility fix
                             className={cn(
-                              `w-full h-[70px] cursor-pointer border disabled:pointer-events-none border-[#B2B2B2] mx-auto pt-1 pr-0.5 pl-0.5 rounded-[5px] flex flex-col items-center justify-center transition`,
+                              `relative w-full h-[85px] cursor-pointer border-2 disabled:pointer-events-none border-gray-300 mx-auto rounded-xl flex flex-col items-center justify-center transition-all duration-200 hover:shadow-lg`,
                               selectedLocationType === option.value &&
-                                "border-primary bg-primary/10",
+                                "border-blue-500 bg-blue-50 shadow-lg scale-105",
                               !option.isAvailable &&
-                                "pointer-events-none !text-gray-400 opacity-80 grayscale",
+                                "pointer-events-none !text-gray-400 opacity-60 grayscale",
                               selectedLocationType === option.value &&
                                 !!error &&
-                                "!border-destructive !bg-destructive/10",
+                                "!border-red-500 !bg-red-50",
                               appConnected &&
                                 selectedLocationType === option.value &&
-                                "!border-green-500 !bg-green-50"
+                                "!border-green-500 !bg-green-50 shadow-green-200"
                             )}
                             disabled={isChecking}
                             onClick={() => {
@@ -305,12 +312,16 @@ const NewEventDialog = ({ btnVariant }: { btnVariant?: string }) => {
                                 <img
                                   src={option.logo as string}
                                   alt={option.label}
-                                  width="20"
-                                  height="20"
+                                  width="28"
+                                  height="28"
+                                  className="mb-2"
                                 />
-                                <span className="mt-1 text-sm">
+                                <span className="text-xs font-medium">
                                   {option.label}
                                 </span>
+                                {appConnected && selectedLocationType === option.value && (
+                                  <span className="absolute top-1 right-1 text-green-500 text-lg">✓</span>
+                                )}
                               </>
                             )}
                           </button>
@@ -334,12 +345,30 @@ const NewEventDialog = ({ btnVariant }: { btnVariant?: string }) => {
               />
             </div>
 
-            <DialogFooter className="bg-[#f6f7f9] border-t px-6 py-3 !mt-6 border-[#e5e7eb] rounded-b-[8px]">
-              <Button type="submit" disabled={!isValid || isPending}>
+            <DialogFooter className="bg-gray-50 border-t px-6 py-4 !mt-6 border-gray-200 rounded-b-[8px] gap-3">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => setIsOpen(false)}
+                className="flex-1 h-12 text-base font-medium"
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="submit" 
+                disabled={!isValid || isPending}
+                className="flex-1 h-12 text-base font-medium bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+              >
                 {isPending ? (
-                  <Loader size="sm" color="white" />
+                  <span className="flex items-center gap-2">
+                    <span className="animate-spin">⏳</span>
+                    Creating...
+                  </span>
                 ) : (
-                  <span>Create</span>
+                  <span className="flex items-center gap-2">
+                    <span>✨</span>
+                    Create Event Type
+                  </span>
                 )}
               </Button>
             </DialogFooter>
