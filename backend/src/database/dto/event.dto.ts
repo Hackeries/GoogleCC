@@ -55,3 +55,25 @@ export class UserNameAndSlugDTO {
   @IsNotEmpty({ message: "Slug is required" })
   slug: string;
 }
+
+export class UpdateEventDto {
+  @IsString({ message: "Title must be a string" })
+  @IsOptional()
+  title?: string;
+
+  @IsString({ message: "Description must be a string" })
+  @IsOptional()
+  description?: string;
+
+  @Transform(({ value }) => Number(value))
+  @IsNumber({}, { message: "Duration must be a number" })
+  @IsOptional()
+  duration?: number;
+
+  @IsEnum(EventLocationEnumType, {
+    message:
+      "Invalid location type. Must be one of: GOOGLE_MEET_AND_CALENDAR, ZOOM_MEETING, MICROSOFT_TEAMS, PHYSICAL, OTHER",
+  })
+  @IsOptional()
+  locationType?: EventLocationEnumType;
+}

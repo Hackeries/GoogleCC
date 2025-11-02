@@ -6,6 +6,7 @@ import {
   EventIdDTO,
   UserNameAndSlugDTO,
   UserNameDTO,
+  UpdateEventDto,
 } from "../database/dto/event.dto";
 import {
   createEventService,
@@ -14,6 +15,7 @@ import {
   getPublicEventsByUsernameService,
   getUserEventsService,
   toggleEventPrivacyService,
+  updateEventService,
 } from "../services/event.service";
 import { asyncHandler } from "../middlewares/asyncHandler.middeware";
 import { createGoogleEvent } from "../lib/google";
@@ -166,6 +168,25 @@ export const deleteEventController = asyncHandlerAndValidation(
 
     return res.status(HTTPSTATUS.OK).json({
       message: "Event deleted successfully",
+    });
+  }
+);
+
+/**
+ * ✅ Update an event
+ */
+export const updateEventController = asyncHandlerAndValidation(
+  UpdateEventDto,
+  "body",
+  async (req: Request, res: Response, updateEventDto) => {
+    const userId = req.user?.id as string;
+    const { eventId } = req.params;
+
+    const event = await updateEventService(userId, eventId, updateEventDto);
+
+    return res.status(HTTPSTATUS.OK).json({
+      message: "Event updated successfully",
+      data: event,
     });
   }
 );
